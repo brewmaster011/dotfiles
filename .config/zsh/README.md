@@ -1,2 +1,3 @@
 # zsh-config
-Shell Configuration
+
+Shell Configuration for ZSH including common aliases, functions, and completions.
