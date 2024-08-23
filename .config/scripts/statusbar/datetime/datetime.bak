@@ -1,0 +1,12 @@
+#!/bin/sh
+
+STATUS="$(playerctl status 2>&1)"
+MUSIC=" |  $(playerctl metadata --format='{{ title }} {{ duration(position) }}/{{ duration(mpris:length) }}' 2>&1)"
+
+if [ "$STATUS" == "No players found" ]; then
+    MUSIC=""
+fi 
+
+DATE="$(date +'  %A %B %e, %H:%M')"
+printf " %s%s " "$DATE" "$MUSIC"
+#date +"  %A %B %e %T" 

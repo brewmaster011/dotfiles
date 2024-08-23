@@ -1,0 +1,5 @@
+#!/bin/zsh
+
+[ -z "$(pactl get-sink-mute 0 | grep yes)" ] && icon="" || icon=""
+
+notify-send $icon
