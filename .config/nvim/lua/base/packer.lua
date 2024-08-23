@@ -12,6 +12,8 @@ return require('packer').startup(function(use)
 		'nvim-telescope/telescope.nvim', tag = '0.1.1',
 		requires = { {'nvim-lua/plenary.nvim'} }
 	}
+
+    -- LSP
 	use {
 		'VonHeikemen/lsp-zero.nvim',
 		branch = 'v1.x',
@@ -34,44 +36,35 @@ return require('packer').startup(function(use)
 			{'rafamadriz/friendly-snippets'}, -- Optional
 		}
 	}
+
+    -- File Explorer
 	use {
 		'nvim-tree/nvim-tree.lua',
 		requires = {
 			'nvim-tree/nvim-web-devicons', -- optional, for file icons
 		},
 	}
---    use {
---        's1n7ax/nvim-terminal',
---        config = function()
---            vim.o.hidden = true
---            require('nvim-terminal').setup()
---        end,
---    }
-    --use {"ellisonleao/glow.nvim", config = function() require("glow").setup() end}
-	use "BurntSushi/ripgrep"
-	use "lukas-reineke/indent-blankline.nvim"
-    -- use "puremourning/vimspector"
+
+    -- Lua
+    use {
+        "folke/which-key.nvim",
+        config = function()
+            vim.o.timeout = true
+            vim.o.timeoutlen = 300
+            require("which-key").setup {
+                -- your configuration comes here
+                -- or leave it empty to use the default settings
+                -- refer to the configuration section below
+            }
+        end
+    }
+
+    -- Other
+	use ('BurntSushi/ripgrep')
+	use ('lukas-reineke/indent-blankline.nvim')
 	use ('nvim-treesitter/nvim-treesitter', {run = ':TSUpdate'})
-    use 'nvim-treesitter/nvim-treesitter-context'
-	use ('mbbill/undotree')
+    use ('nvim-treesitter/nvim-treesitter-context')
 	use ('tpope/vim-fugitive')
 	use ("ellisonleao/gruvbox.nvim")
- -- Lua
-    use {
-      "folke/which-key.nvim",
-      config = function()
-        vim.o.timeout = true
-        vim.o.timeoutlen = 300
-        require("which-key").setup {
-          -- your configuration comes here
-          -- or leave it empty to use the default settings
-          -- refer to the configuration section below
-        }
-      end
-    }   
-    use ('github/copilot.vim')
-    use("eandrju/cellular-automaton.nvim")
---    use { "mfussenegger/nvim-dap", }
---    use { "rcarriga/nvim-dap-ui", requires = {"mfussenegger/nvim-dap"} }
-end)
 
+end)

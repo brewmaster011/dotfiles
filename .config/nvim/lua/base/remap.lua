@@ -27,10 +27,6 @@ vim.keymap.set("n", "<leader>lp", ":lprevious<CR>")
 vim.keymap.set("n", "<leader>lo", ":lolder<CR>")
 vim.keymap.set("n", "<leader>ln", ":lnewer<CR>")
 
--- Copoilot remaps
-vim.g.copilot_no_tab_map = true
-vim.api.nvim_set_keymap("i", "<C-J>", 'copilot#Accept("<CR>")', { silent = true, expr = true })
-
 -- Misc
 vim.keymap.set("n", "<leader>jq", ":%!jq<CR>")
 vim.keymap.set("n", "<leader>n", ":noh<CR>")
