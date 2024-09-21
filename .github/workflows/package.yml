@@ -2,9 +2,8 @@ name: Create release with archives
 
 on:
   pull_request:
-    branches:
-      - master  # Or your default branch
-    types: [closed]
+    tags:
+      - '*'
 
 jobs:
   create_release:
@@ -21,8 +20,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.sha }} 
-          release_name: Configuration Files
+          tag_name: ${{ github.ref_name }} 
+          release_name: ${{ github.ref_name }}
           draft: false
           prerelease: false
 
