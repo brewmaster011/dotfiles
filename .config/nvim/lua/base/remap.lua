@@ -28,5 +28,9 @@ vim.keymap.set("n", "<leader>lo", ":lolder<CR>")
 vim.keymap.set("n", "<leader>ln", ":lnewer<CR>")
 
 -- Misc
+
+-- Format json with jq
 vim.keymap.set("n", "<leader>jq", ":%!jq<CR>")
+
+-- Disable Search Highligting
 vim.keymap.set("n", "<leader>n", ":noh<CR>")

@@ -18,6 +18,7 @@ local on_attach = function (client, bufnr)
 end
 
 local lspconfig = require("lspconfig")
+
 lspconfig.csharp_ls.setup({
     lsp.csharp_ls,
     root_dir = function(startpath)
@@ -59,6 +60,20 @@ lspconfig.ltex.setup({
         language = "en-GB",
     },
     on_attach = on_attach,
+})
+
+lspconfig.pylsp.setup({
+    lsp.pylsp,
+    on_attach = on_attach,
+    settings = {
+        pylsp = {
+            plugins = {
+                black = { enabled = true },
+                pyflakes = { enabled = true },
+                pycodestyle = { enabled = false },
+            },
+        }
+    },
 })
 
 lsp.setup()

@@ -115,4 +115,6 @@ export DOTNET_ROOT=/usr/share/dotnet
 export FZF_DEFAULT_OPTS='--height 30% --layout=reverse --border'
 export ZSH_COMPDUMP=/home/bshtrepi/.cache/zsh/zcompdump
 
+export MOZ_USE_XINPUT2=1
+
 source /home/bshtrepi/.config/zsh/.fzf.zsh
