@@ -3,11 +3,8 @@
 # Check and initialize ssh-agent
 [ -z "$SSH_AUTH_SOCK" ] && eval $(ssh-agent)
 
-# Set wallpaper
-/home/bshtrepi/.config/feh/wallpaper/fehbg
-
 # Color calibration for framework laptop 14
-xcalib -v /home/bshtrepi/.config/color-calibration/BOE_CQ_______NE135FBM_N41_03.icm
+# xcalib -v /home/bshtrepi/.config/color-calibration/BOE_CQ_______NE135FBM_N41_03.icm
 
 # Autostart at login
 xss-lock -- slock &
@@ -15,9 +12,11 @@ unclutter &
 dwmblocks &
 picom --config /home/bshtrepi/.config/picom/picom.conf &
 dunst &
-nm-applet &
-blueman-applet &
-#
+
+# Replaced by statusbar scripts
+#nm-applet &
+#blueman-applet &
+
 # To start pipewire-pulse and wireplumber add the following lines to:
 # '/usr/share/pipewire/pipewire.conf'
 #
@@ -27,7 +26,13 @@ blueman-applet &
 # ]
 #
 pipewire &
-pasystray &
+#pasystray &
+
+# Set screen rotation
+xrandr --output DSI-1 --primary --rotate right
+
+# Set wallpaper
+/home/bshtrepi/.config/feh/wallpaper/fehbg
 
 # Misc settings
 xset r rate 450 150

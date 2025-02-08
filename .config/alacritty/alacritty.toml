@@ -1,20 +1,20 @@
 [font]
-size = 8.0
+size = 14.0
 
 [font.bold]
-family = "SauceCodePro Nerd Font"
+family = "Hack Nerd Font"
 style = "Bold"
 
 [font.bold_italic]
-family = "SauceCodePro Nerd Font"
+family = "Hack Nerd Font"
 style = "Bold Italic"
 
 [font.italic]
-family = "SauceCodePro Nerd Font"
+family = "Hack Nerd Font"
 style = "Italic"
 
 [font.normal]
-family = "SauceCodePro Nerd Font"
+family = "Hack Nerd Font"
 style = "Regular"
 
 [font.offset]
