@@ -1,6 +1,0 @@
-#!/bin/sh
-
-BRIGHTNESS_RAW=$(< /sys/class/backlight/amdgpu_bl1/brightness)
-let BRIGHTNESS=$(echo "$BRIGHTNESS_RAW / 255 * 100" | bc -l | cut -d. -f1)
-
-echo -ne "󰃠  $BRIGHTNESS"
