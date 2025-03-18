@@ -33,3 +33,15 @@ opacity = 0.8
 [window.padding]
 x = 2
 y = 2
+
+[scrolling]
+history = 100000
+multiplier = 1
+
+[mouse]
+hide_when_typing = true
+
+[keyboard]
+bindings = [
+  { key = "N", mods = "Control|Shift", action = "CreateNewWindow" }
+]
