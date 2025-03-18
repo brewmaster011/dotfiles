@@ -60,6 +60,7 @@ return require('packer').startup(function(use)
     }
 
     -- Other
+    use {'onsails/lspkind.nvim'}
 	use ('BurntSushi/ripgrep')
 	use ('lukas-reineke/indent-blankline.nvim')
 	use ('nvim-treesitter/nvim-treesitter', {run = ':TSUpdate'})
