@@ -33,6 +33,9 @@ pasystray &
 xset r rate 450 150
 xset s off
 
+# Keyboard Map
+# xmodmap ~/.config/xmodmap/xmodmap
+
 # Start dwm
 while true; do
     dbus-launch --exit-with-session dwm 2> ~/.cache/$(date).dwm.error.log

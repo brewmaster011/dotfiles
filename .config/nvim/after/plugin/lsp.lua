@@ -76,4 +76,9 @@ lspconfig.pylsp.setup({
     },
 })
 
+lspconfig.clangd.setup({
+    lsp.clang,
+    on_attach = on_attach
+})
+
 lsp.setup()

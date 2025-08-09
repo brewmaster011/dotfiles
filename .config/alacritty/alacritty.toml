@@ -2,19 +2,19 @@
 size = 8.0
 
 [font.bold]
-family = "SauceCodePro Nerd Font"
+family = "Inconsolata Go Nerd Font"
 style = "Bold"
 
 [font.bold_italic]
-family = "SauceCodePro Nerd Font"
+family = "Inconsolata Go Nerd Font"
 style = "Bold Italic"
 
 [font.italic]
-family = "SauceCodePro Nerd Font"
+family = "Inconsolata Go Nerd Font"
 style = "Italic"
 
 [font.normal]
-family = "SauceCodePro Nerd Font"
+family = "Inconsolata Go Nerd Font"
 style = "Regular"
 
 [font.offset]
@@ -33,3 +33,15 @@ opacity = 0.8
 [window.padding]
 x = 2
 y = 2
+
+[scrolling]
+history = 100000
+multiplier = 1
+
+[mouse]
+hide_when_typing = true
+
+[keyboard]
+bindings = [
+  { key = "N", mods = "Control|Shift", action = "CreateNewWindow" }
+]

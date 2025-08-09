@@ -9,7 +9,7 @@ return require('packer').startup(function(use)
 
 	-- Telescope, fuzzy finder
 	use {
-		'nvim-telescope/telescope.nvim', tag = '0.1.1',
+		'nvim-telescope/telescope.nvim', tag = '0.1.4',
 		requires = { {'nvim-lua/plenary.nvim'} }
 	}
 
@@ -59,7 +59,19 @@ return require('packer').startup(function(use)
         end
     }
 
+    use({
+        'MeanderingProgrammer/render-markdown.nvim',
+        after = { 'nvim-treesitter' },
+        requires = { 'echasnovski/mini.nvim', opt = true }, -- if you use the mini.nvim suite
+        -- requires = { 'echasnovski/mini.icons', opt = true }, -- if you use standalone mini plugins
+        -- requires = { 'nvim-tree/nvim-web-devicons', opt = true }, -- if you prefer nvim-web-devicons
+        config = function()
+            require('render-markdown').setup({})
+        end,
+    })
+
     -- Other
+    use {'onsails/lspkind.nvim'}
 	use ('BurntSushi/ripgrep')
 	use ('lukas-reineke/indent-blankline.nvim')
 	use ('nvim-treesitter/nvim-treesitter', {run = ':TSUpdate'})
