@@ -7,7 +7,7 @@ case $STATUS in
     "Charging")
         ICON="󰂄"
         ;;
-    "Not")
+    "Not charging")
         ICON="󱈑"
         #CHARGE=$(acpi | grep "Battery 0" | awk '{print $5}' | sed 's/\%,//g;s/%//g')
         ;;
