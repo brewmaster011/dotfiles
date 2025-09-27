@@ -12,7 +12,8 @@
     "backlight",
     "pulseaudio",
     "bluetooth",
-    "network"
+    "network",
+    "tray"
   ],
   "hyprland/workspaces": {
     "on-click": "activate",
