@@ -1,0 +1,12 @@
+# Runit runtime files
+.config/runit/**/supervise/
+
+# Common runtime/temporary files
+*.log
+*.pid
+*.lock
+*.tmp
+
+# Cache directories
+*cache*/
+*Cache*/
