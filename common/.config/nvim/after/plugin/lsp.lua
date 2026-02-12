@@ -1,89 +1,63 @@
+-- ABOUTME: LSP setup using Mason, mason-lspconfig, and nvim-lspconfig
+-- ABOUTME: Uses automatic_enable for installed servers, keymaps via LspAttach autocmd
 
-local lsp = require('lsp-zero')
--- lsp.preset('recommended')
-lsp.nvim_workspace()
+-- Setup Mason first
+require("mason").setup()
 
-local on_attach = function (client, bufnr)
-    local opts = {buffer = bufnr, remap = false}
+-- mason-lspconfig handles automatic enabling of installed servers
+require("mason-lspconfig").setup({
+    ensure_installed = {
+        "lua_ls",
+        "csharp_ls",
+        "intelephense",
+        "spectral",
+        "dockerls",
+        "ltex",
+        "pylsp",
+        "clangd",
+        "gopls",
+    },
+    -- Automatically enable installed servers via vim.lsp.enable()
+    automatic_enable = true,
+})
 
-    vim.keymap.set("n", "<leader>d", function() vim.lsp.buf.definition() end, opts)
-    vim.keymap.set("n", "<leader>k", function() vim.lsp.buf.hover() end, opts)
-    -- vim.keymap.set("n", "<leader>r", function() vim.lsp.buf.references() end, opts)
-    vim.keymap.set("n", "<leader>i", function() vim.lsp.buf.implementation() end, opts)
-    vim.keymap.set("n", "<leader>e", function() vim.diagnostic.open_float() end, opts)
+-- Load shared LSP config (capabilities)
+local lsp = require("lsp")
 
-    vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, opts)
-    vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, opts)
-    vim.keymap.set('n', '<space>f', function() vim.lsp.buf.format { async = true } end, opts)
+-- Apply global defaults to all LSP servers
+vim.lsp.config("*", {
+    capabilities = lsp.capabilities,
+})
+
+-- Load any custom per-server configs from lua/lsp/<server>.lua
+local lsp_config_path = vim.fn.stdpath("config") .. "/lua/lsp"
+local files = vim.fn.glob(lsp_config_path .. "/*.lua", false, true)
+
+for _, file in ipairs(files) do
+    local server_name = vim.fn.fnamemodify(file, ":t:r")
+    -- Skip init.lua (that's our shared config)
+    if server_name ~= "init" then
+        local ok, custom_config = pcall(require, "lsp." .. server_name)
+        if ok and custom_config then
+            vim.lsp.config(server_name, custom_config)
+        end
+    end
 end
 
-local lspconfig = require("lspconfig")
+-- Set up keymaps when LSP attaches to a buffer
+vim.api.nvim_create_autocmd("LspAttach", {
+    group = vim.api.nvim_create_augroup("lsp-attach-keymaps", { clear = true }),
+    callback = function(args)
+        local bufnr = args.buf
+        local opts = { buffer = bufnr, remap = false }
 
-lspconfig.csharp_ls.setup({
-    lsp.csharp_ls,
-    root_dir = function(startpath)
-        return lspconfig.util.root_pattern("*.sln")(startpath)
-            or lspconfig.util.root_pattern("*.csproj")(startpath)
-            or lspconfig.util.root_pattern("*.fsproj")(startpath)
-            or lspconfig.util.root_pattern(".git")(startpath)
+        vim.keymap.set("n", "<leader>d", vim.lsp.buf.definition, opts)
+        vim.keymap.set("n", "<leader>k", vim.lsp.buf.hover, opts)
+        vim.keymap.set("n", "<leader>i", vim.lsp.buf.implementation, opts)
+        vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, opts)
+
+        vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, opts)
+        vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action, opts)
+        vim.keymap.set("n", "<space>f", function() vim.lsp.buf.format({ async = true }) end, opts)
     end,
-    on_attach = on_attach,
 })
-
-lspconfig.intelephense.setup({
-    lsp.intelephense,
-    on_attach = on_attach,
-})
-
-lspconfig.spectral.setup({
-    lsp.spectral,
-    on_attach = on_attach,
-})
-
-lspconfig.dockerls.setup({
-    lsp.dockerls,
-    on_attach = on_attach,
-})
-
-lspconfig.cucumber_language_server.setup({
-    lsp.cucumber_language_server,
-    settings = {
-        features = { "**/*.feature" },
-        glue = { "**/Steps/*.steps.cs", "**/Steps/*.step.cs" }
-    },
-    on_attach = on_attach,
-})
-
-lspconfig.ltex.setup({
-    lsp.ltex,
-    settings = {
-        language = "en-GB",
-    },
-    on_attach = on_attach,
-})
-
-lspconfig.pylsp.setup({
-    lsp.pylsp,
-    on_attach = on_attach,
-    settings = {
-        pylsp = {
-            plugins = {
-                black = { enabled = true },
-                pyflakes = { enabled = true },
-                pycodestyle = { enabled = false },
-            },
-        }
-    },
-})
-
-lspconfig.clangd.setup({
-    lsp.clang,
-    on_attach = on_attach
-})
-
-lspconfig.gopls.setup({
-    lsp.gopls,
-    on_attach = on_attach,
-})
-
-lsp.setup()
