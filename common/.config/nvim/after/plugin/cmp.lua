@@ -1,27 +1,28 @@
-local cmp = require'cmp'
+-- ABOUTME: Autocompletion configuration using nvim-cmp
+-- ABOUTME: Custom formatting with lspkind and highlight groups for completion menu
+
+local cmp = require("cmp")
 
 cmp.setup({
     snippet = {
         expand = function(args)
-            require('luasnip').lsp_expand(args.body)
+            vim.snippet.expand(args.body)
         end,
     },
     mapping = {
-        ['<C-n>'] = cmp.mapping.select_next_item(),
-        ['<C-p>'] = cmp.mapping.select_prev_item(),
-        ['<C-Space>'] = cmp.mapping.complete(),
-        ['<C-e>'] = cmp.mapping.close(),
-        ['<CR>'] = cmp.mapping.confirm({ select = true }),
+        ["<C-n>"] = cmp.mapping.select_next_item(),
+        ["<C-p>"] = cmp.mapping.select_prev_item(),
+        ["<C-Space>"] = cmp.mapping.complete(),
+        ["<C-e>"] = cmp.mapping.close(),
+        ["<CR>"] = cmp.mapping.confirm({ select = true }),
     },
     sources = {
-        { name = 'nvim_lsp' },
-        -- { name = 'copilot' },
-        { name = 'buffer' },
-        { name = 'path' },
-        { name = 'luasnip' },
+        { name = "nvim_lsp" },
+        { name = "buffer" },
+        { name = "path" },
     },
     completion = {
-        autocomplete = { require('cmp.types').cmp.TriggerEvent.TextChanged },
+        autocomplete = { require("cmp.types").cmp.TriggerEvent.TextChanged },
     },
     window = {
         completion = {
@@ -31,17 +32,16 @@ cmp.setup({
         },
         documentation = {
             winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:None",
-            border = 'none',
-        }
+            border = "none",
+        },
     },
     formatting = {
         fields = { "kind", "abbr", "menu" },
         format = function(entry, vim_item)
-
             local kind = require("lspkind").cmp_format({
                 mode = "symbol_text",
                 maxwidth = 50,
-                symbol_map = { Copilot = "" },
+                symbol_map = { Copilot = "" },
             })(entry, vim_item)
 
             local strings = vim.split(kind.kind, "%s", { trimempty = true })
