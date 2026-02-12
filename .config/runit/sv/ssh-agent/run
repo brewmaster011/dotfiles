@@ -1,2 +1,3 @@
 #!/bin/sh
+rm -f "$HOME/.ssh/ssh_auth_sock"
 exec ssh-agent -D -a "$HOME/.ssh/ssh_auth_sock"
