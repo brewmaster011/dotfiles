@@ -1,5 +1,8 @@
+# ABOUTME: Git ignore patterns for dotfiles repo
+# ABOUTME: Excludes runtime files, caches, and auto-generated configs
+
 # Runit runtime files
-.config/runit/**/supervise/
+linux/.config/runit/**/supervise/
 
 # Common runtime/temporary files
 *.log
@@ -11,6 +14,18 @@
 *cache*/
 *Cache*/
 
-# Auto-generated files
-.config/hypr/monitors.conf
-.config/hypr/workspaces.conf
+# Auto-generated Hyprland files
+hyprland/.config/hypr/monitors.conf
+hyprland/.config/hypr/workspaces.conf
+
+# Neovim plugin state (managed by lazy.nvim)
+common/.config/nvim/plugin/packer_compiled.lua
+
+# Secrets (add your secret files here)
+# .env
+# credentials.json
+# *.secret
+
+# OS-specific
+.DS_Store
+Thumbs.db
