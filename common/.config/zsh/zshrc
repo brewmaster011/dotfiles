@@ -50,6 +50,12 @@ autoload -U compinit
 zstyle ':completion:*' menu select
 zmodload zsh/complist
 compinit -d ~/.cache/zsh/zcompdump
+
+# Compile zcompdump to bytecode for faster loading
+if [[ ! ~/.cache/zsh/zcompdump.zwc -nt ~/.cache/zsh/zcompdump ]]; then
+  zcompile ~/.cache/zsh/zcompdump
+fi
+
 _comp_options+=(globdots)		# Include hidden files.
 
 # vi mode
