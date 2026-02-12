@@ -4,11 +4,11 @@
 [ "$(playerctl status)" != "Playing" ] && exit 0
 
 ARTWORK=$(playerctl metadata mpris:artUrl)
-[ "$ARTWORK" == "$(cat /home/bshtrepi/.cache/spotifyd/albumart/current.txt)" ] && exit 0
+[ "$ARTWORK" == "$(cat $HOME/.cache/spotifyd/albumart/current.txt)" ] && exit 0
 
 # Fetch the album art
-echo $ARTWORK > /home/bshtrepi/.cache/spotifyd/albumart/current.txt
-curl -s $ARTWORK > /home/bshtrepi/.cache/spotifyd/albumart/current.jpg
+echo $ARTWORK > $HOME/.cache/spotifyd/albumart/current.txt
+curl -s $ARTWORK > $HOME/.cache/spotifyd/albumart/current.jpg
 
 # Fetch title, artist and album
 TITLE=$(playerctl metadata title)
@@ -17,6 +17,6 @@ ALBUM=$(playerctl metadata album)
 
 # Send notification
 notify-send \
-    -i /home/bshtrepi/.cache/spotifyd/albumart/current.jpg \
+    -i $HOME/.cache/spotifyd/albumart/current.jpg \
     "Now Playing: $TITLE" \
     "By $ARTIST - $ALBUM"

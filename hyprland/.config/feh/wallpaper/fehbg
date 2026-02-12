@@ -2,5 +2,5 @@
 
 feh --no-fehbg\
     --bg-fill\
-    '/home/bshtrepi/Pictures/wallpaper/bebop.jpeg'
+    "$HOME/Pictures/wallpaper/bebop.jpeg"
 

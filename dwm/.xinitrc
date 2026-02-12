@@ -4,16 +4,16 @@
 [ -z "$SSH_AUTH_SOCK" ] && eval $(ssh-agent)
 
 # Set wallpaper
-/home/bshtrepi/.config/feh/wallpaper/fehbg
+$HOME/.config/feh/wallpaper/fehbg
 
 # Color calibration for framework laptop 14
-xcalib -v /home/bshtrepi/.config/color-calibration/BOE_CQ_______NE135FBM_N41_03.icm
+xcalib -v $HOME/.config/color-calibration/BOE_CQ_______NE135FBM_N41_03.icm
 
 # Autostart at login
 xss-lock -- slock &
 unclutter &
 dwmblocks &
-picom --config /home/bshtrepi/.config/picom/picom.conf &
+picom --config $HOME/.config/picom/picom.conf &
 dunst &
 nm-applet &
 blueman-applet &
