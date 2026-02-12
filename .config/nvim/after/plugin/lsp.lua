@@ -81,4 +81,9 @@ lspconfig.clangd.setup({
     on_attach = on_attach
 })
 
+lspconfig.gopls.setup({
+    lsp.gopls,
+    on_attach = on_attach,
+})
+
 lsp.setup()
