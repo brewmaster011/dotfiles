@@ -132,8 +132,8 @@ bindkey -s '^n' '^unotes\n'
 # cd Fuzzy Finder
 bindkey -s '^f' '^ucd "$(dirname "$(fzf)")"\n'
 bindkey -s '^g' '^ucd "$(find ~/Documents/source -maxdepth 1 -mindepth 1 -type d | fzf)"\n'
-export PATH="$HOME/.cargo/bin:/usr/local/go/bin:$PATH"
-export DOTNET_ROOT=/usr/share/dotnet
+export PATH="$HOME/.cargo/bin:$HOME/.dotnet:/usr/local/go/bin:$PATH"
+export DOTNET_ROOT="$HOME/.dotnet"
 export FZF_DEFAULT_OPTS='--height 30% --layout=reverse --border'
 export ZSH_COMPDUMP="$HOME/.cache/zsh/zcompdump"
 
