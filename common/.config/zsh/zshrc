@@ -1,9 +1,26 @@
 export GIT_PS1_SHOWDIRTYSTATE=true
 export GIT_PS1_SHOWUNTRACKEDFILES=true
 
+# Detect OS
+case "$(uname -s)" in
+    Linux*)  export OS_TYPE="linux";;
+    Darwin*) export OS_TYPE="macos";;
+esac
+
+# OS-specific settings
+if [[ "$OS_TYPE" == "macos" ]]; then
+    # Homebrew path (Apple Silicon)
+    eval "$(/opt/homebrew/bin/brew shellenv)" 2>/dev/null
+    # macOS uses Keychain for SSH - no custom socket needed
+else
+    # Linux SSH agent socket (managed by runit service)
+    export SSH_AUTH_SOCK="$HOME/.ssh/ssh_auth_sock"
+fi
+
 setopt PROMPT_SUBST
 
-if [ -z "${DISPLAY}" ] && [ "${XDG_VTNR}" -eq 1 ]; then
+# Auto-start X on Linux TTY1 (for dwm)
+if [[ "$OS_TYPE" == "linux" ]] && [ -z "${DISPLAY}" ] && [ "${XDG_VTNR}" -eq 1 ]; then
   exec startx
 fi
 
@@ -69,11 +86,10 @@ preexec() { echo -ne '\e[5 q' ;} # Use beam shape cursor for each new prompt.
 autoload edit-command-line; zle -N edit-command-line
 bindkey '^e' edit-command-line
 
-# Load syntax highlighting; should be last.
-source /home/bshtrepi/Documents/repos/zsh-plugins/fzf-tab/fzf-tab.plugin.zsh
-source ~/Documents/repos/zsh-plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source ~/.config/zsh/kubectl_autocomplete
-# source ~/github/zsh-autosuggestions/zsh-autosuggestions.zsh
+# Load zsh plugins (managed as git submodules)
+source "$HOME/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh"
+source "$HOME/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+source "$HOME/.config/zsh/kubectl_autocomplete"
 
 # disable sort when completing `git checkout`
 zstyle ':completion:*:git-checkout:*' sort false
@@ -81,8 +97,8 @@ zstyle ':completion:*:git-checkout:*' sort false
 zstyle ':completion:*:descriptions' format '[%d]'
 # set list-colors to enable filename colorizing
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-# preview directory's content with exa when completing cd
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'
+# preview directory's content with eza when completing cd
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
 # switch group using `,` and `.`
 zstyle ':fzf-tab:*' switch-group ',' '.'
 # extra configuration for fzf-tab
@@ -110,13 +126,11 @@ bindkey -s '^n' '^unotes\n'
 # cd Fuzzy Finder
 bindkey -s '^f' '^ucd "$(dirname "$(fzf)")"\n'
 bindkey -s '^g' '^ucd "$(find ~/Documents/source -maxdepth 1 -mindepth 1 -type d | fzf)"\n'
-export PATH=/home/bshtrepi/.cargo/bin:/usr/local/go/bin:$PATH 
+export PATH="$HOME/.cargo/bin:/usr/local/go/bin:$PATH"
 export DOTNET_ROOT=/usr/share/dotnet
 export FZF_DEFAULT_OPTS='--height 30% --layout=reverse --border'
-export ZSH_COMPDUMP=/home/bshtrepi/.cache/zsh/zcompdump
-
-export SSH_AUTH_SOCK="$HOME/.ssh/ssh_auth_sock"
+export ZSH_COMPDUMP="$HOME/.cache/zsh/zcompdump"
 
 export MOZ_USE_XINPUT2=1
 
-source /home/bshtrepi/.config/zsh/.fzf.zsh
+source "$HOME/.config/zsh/.fzf.zsh"

@@ -3,4 +3,4 @@
 source ~/.config/zsh/zshrc
 
 # opencode
-export PATH=/home/bshtrepi/.opencode/bin:$PATH
+export PATH="$HOME/.opencode/bin:$PATH"
