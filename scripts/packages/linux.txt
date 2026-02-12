@@ -1,0 +1,21 @@
+# ABOUTME: Linux-specific packages
+# ABOUTME: Installed only on Linux systems
+
+# Desktop environment tools
+dunst
+kanata
+ranger
+neofetch
+
+# For Hyprland
+# hyprland
+# waybar
+# wofi
+# hyprpaper
+# hypridle
+# hyprlock
+
+# For dwm
+# picom
+# xorg-server
+# xorg-xinit
