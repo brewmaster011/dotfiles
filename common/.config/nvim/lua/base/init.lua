@@ -1,6 +1,6 @@
 require("base.remap")
 require("base.set")
-require("base.packer")
+require("base.lazy")
 
 -- examples for your init.lua
 
