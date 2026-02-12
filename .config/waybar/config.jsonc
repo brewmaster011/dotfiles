@@ -4,7 +4,7 @@
   "position": "top",
   "spacing": 0,
   "height": 26,
-  "modules-left": ["hyprland/workspaces"],
+  "modules-left": ["hyprland/workspaces", "hyprland/window"],
   "modules-center": ["clock"],
   "modules-right": [
     "battery",
@@ -30,6 +30,11 @@
       "8": "8",
       "9": "9",
     },
+  },
+  "hyprland/window": {
+    "format": "{}",
+    "max-length": 50,
+    "separate-outputs": true
   },
   "cpu": {
     "interval": 5,
@@ -80,14 +85,14 @@
     "on-click": "blueman-manager"
   },
   "pulseaudio": {
-    "format": "{icon}",
+    "format": "{volume}% {icon}",
     "on-click": "$TERM --class=Wiremix -e wiremix",
     "on-click-right": "pamixer -t",
     "tooltip-format": "Volume: {volume}%",
     "scroll-step": 5,
-    "format-muted": "",
+    "format-muted": " ",
     "format-icons": {
-      "default": ["", "", ""]
+      "default": ["", " ", " "]
     }
   },
   "tray": {
@@ -95,7 +100,7 @@
     "spacing": 12
   },
   "backlight": {
-      "format": "{icon}",
+      "format": "{percent}% {icon}",
       "format-icons": ["󰃞", "󰃟", "󰃠"],
       "tooltip-format": "Brightness: {percent}%"
   },

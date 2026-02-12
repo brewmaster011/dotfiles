@@ -29,9 +29,12 @@
 }
 
 #workspaces button.active {
-  color: green
+  color: #FFF;
 }
 
+#window {
+  margin-left: 10px;
+}
 
 /* All other modules - consistent spacing */
 #tray,
