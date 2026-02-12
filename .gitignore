@@ -10,3 +10,7 @@
 # Cache directories
 *cache*/
 *Cache*/
+
+# Auto-generated files
+.config/hypr/monitors.conf
+.config/hypr/workspaces.conf
