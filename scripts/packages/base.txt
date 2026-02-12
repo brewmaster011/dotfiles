@@ -1,0 +1,12 @@
+# ABOUTME: Cross-platform base packages
+# ABOUTME: These are installed on both Linux and macOS
+
+# Core tools
+git
+stow
+neovim
+zsh
+fzf
+ripgrep
+eza
+zellij

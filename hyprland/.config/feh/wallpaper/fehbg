@@ -1,0 +1,6 @@
+#!/bin/sh
+
+feh --no-fehbg\
+    --bg-fill\
+    "$HOME/Pictures/wallpaper/bebop.jpeg"
+

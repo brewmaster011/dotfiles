@@ -1,0 +1,5 @@
+# ABOUTME: macOS-specific packages (via Homebrew)
+# ABOUTME: Installed only on macOS
+
+# Window manager
+# aerospace  # Uncomment when available on Homebrew or install via cask

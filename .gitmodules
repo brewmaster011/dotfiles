@@ -1,0 +1,6 @@
+[submodule "common/.config/zsh/plugins/fzf-tab"]
+	path = common/.config/zsh/plugins/fzf-tab
+	url = https://github.com/Aloxaf/fzf-tab
+[submodule "common/.config/zsh/plugins/zsh-syntax-highlighting"]
+	path = common/.config/zsh/plugins/zsh-syntax-highlighting
+	url = https://github.com/zsh-users/zsh-syntax-highlighting
