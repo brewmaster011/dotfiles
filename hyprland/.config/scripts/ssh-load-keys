@@ -1,0 +1,12 @@
+#!/bin/sh
+# ABOUTME: Boot-time SSH key loader for Hyprland
+# ABOUTME: Waits for ssh-agent socket then loads all SSH keys via SSH_ASKPASS
+
+# Wait up to 5 seconds for ssh-agent socket
+n=0
+while [ ! -S "$HOME/.ssh/ssh_auth_sock" ] && [ $n -lt 50 ]; do
+    sleep 0.1
+    n=$((n+1))
+done
+
+ssh-add ~/.ssh/github ~/.ssh/main ~/.ssh/remote ~/.ssh/remote_git ~/.ssh/work < /dev/null

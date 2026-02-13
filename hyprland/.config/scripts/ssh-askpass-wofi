@@ -1,0 +1,4 @@
+#!/bin/sh
+# ABOUTME: SSH_ASKPASS implementation using wofi for Wayland/Hyprland
+# ABOUTME: Prompts for SSH key passphrases via wofi's dmenu password mode
+echo "" | wofi --dmenu --password --prompt="$1" --width=600 --height=60 --lines=0 2>/dev/null
