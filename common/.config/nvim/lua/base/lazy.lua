@@ -62,6 +62,7 @@ require("lazy").setup({
     },
 
     -- UI/Visual
+    { "nvim-lualine/lualine.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
     { "onsails/lspkind.nvim" },
     { "lukas-reineke/indent-blankline.nvim", main = "ibl" },
     { "ellisonleao/gruvbox.nvim" },
