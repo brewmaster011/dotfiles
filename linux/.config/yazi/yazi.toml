@@ -1,0 +1,11 @@
+# ABOUTME: Yazi general configuration.
+# ABOUTME: Custom linemode, sorting preferences, and display settings.
+
+[mgr]
+ratio         = [1, 2, 4]
+linemode      = "size_and_mtime"
+sort_by       = "natural"
+sort_dir_first = true
+sort_sensitive = false
+show_symlink  = true
+scrolloff     = 5

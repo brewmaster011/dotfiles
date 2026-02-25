@@ -1,0 +1,6 @@
+# ABOUTME: Yazi theme configuration.
+# ABOUTME: Uses gruvbox-dark flavor for both dark and light modes.
+
+[flavor]
+dark  = "gruvbox-dark"
+light = "gruvbox-dark"
