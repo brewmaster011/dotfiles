@@ -25,7 +25,7 @@ stow common linux hyprland -t ~
 | `hyprland` | Linux | Hyprland, Waybar, Wofi, Hyprlock, Hypridle, Hyprpaper |
 | `dwm` | Linux | Picom, Xmodmap, .xinitrc |
 | `framework` | Linux | Color calibration (ICC profile), EasyEffects preset |
-| `macos` | macOS | AeroSpace (placeholder) |
+| `macos` | macOS | AeroSpace, Alacritty, Kanata, Zsh |
 | `scripts` | N/A | Bootstrap script, Makefile, package lists (not stowed) |
 
 ## Per-Machine Examples
@@ -84,9 +84,12 @@ dotfiles/
 │       ├── color-calibration/  # ICC profile
 │       └── easyeffects/        # Audio preset
 │
-├── macos/                  # macOS (placeholder)
+├── macos/                  # macOS
 │   └── .config/
-│       └── aerospace/      # Tiling WM
+│       ├── aerospace/      # Tiling WM
+│       ├── alacritty/      # OS-specific window settings
+│       ├── kanata/         # Keyboard remapper (home row mods)
+│       └── zsh/            # macOS aliases and zshrc.local
 │
 ├── scripts/                # Installation tools
 │   ├── install.sh          # Bootstrap script

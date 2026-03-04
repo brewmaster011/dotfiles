@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 #  ---------------------------------------------------------------------------
 #
 #  Description:  This file holds all general BASH aliases
@@ -33,28 +33,10 @@ alias grep='grep --color=auto'
 alias diff='diff --color=auto'
 alias df='df -h'
 alias du='du -h'
-alias free='free -h'
 alias urxvt='alacritty'
-alias pretty=$'jq -R \'. as $line | try (fromjson) catch $line\''   # ZSH SPECIFIC!! Pretty print JSON logs
-
-# Laptop battery control and thermal profiles
-# alias cctk="cd /opt/dell/dcc && sudo ./cctk"
-alias performance="sudo smbios-thermal-ctl --set-thermal-mode=Performance && powerprofilesctl set performance"
-alias balanced="sudo smbios-thermal-ctl --set-thermal-mode=Balanced && powerprofilesctl set balanced"
-alias cool-bottom="sudo smbios-thermal-ctl --set-thermal-mode=Cool-Bottom && powerprofilesctl set power-saver"
-alias quiet="sudo smbios-thermal-ctl --set-thermal-mode=Quiet && powerprofilesctl set power-saver"
-
-# Wireguard shortcuts
-alias connect_main="wg-quick up wg0"
-alias disconnect_main="wg-quick down wg0"
-
-# Flatpak run application
-alias Spotify="flatpak run com.Spotify.Client"
+alias pretty='jq -R '"'"'. as $line | try (fromjson) catch $line'"'"''   # Pretty print JSON logs
 
 # Kubernetes aliases
 alias k="kubectl"
 alias ke="kubens"
 alias kc="kubectx"
-
-# Get wifi password
-alias wifipass="nmcli dev wifi show-password"

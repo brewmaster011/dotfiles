@@ -1,0 +1,4 @@
+# Linux-specific Alacritty window settings
+[window]
+decorations = "none"
+dynamic_padding = true

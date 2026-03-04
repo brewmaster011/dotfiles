@@ -1,3 +1,5 @@
+import = ["~/.config/alacritty/os.toml"]
+
 [font]
 size = 14
 
@@ -25,8 +27,6 @@ y = 0
 save_to_clipboard = true
 
 [window]
-decorations = "none"
-dynamic_padding = true
 dynamic_title = true
 opacity = 0.8
 

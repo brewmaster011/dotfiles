@@ -1,6 +1,3 @@
-#!/bin/sh
+#!/bin/zsh
 
 source ~/.config/zsh/zshrc
-
-# opencode
-export PATH="$HOME/.opencode/bin:$PATH"

@@ -1,11 +1,11 @@
-#!/usr/bin/env bash
+#!/bin/sh
 #  ---------------------------------------------------------------------------
 
 # Directory Listing aliases
 
 alias ls='ls --color=auto'	# ls will be colorful!
 alias dir='ls -hFx'
-alias l.='ls -d .* --color=tty' # short listing, only hidden files - .*
+alias l.='ls -d .* --color=auto' # short listing, only hidden files - .*
 alias l='ls -lathF'             # long, sort by newest to oldest
 alias L='ls -latrhF'            # long, sort by oldest to newest
 alias la='ls -Al'               # show hidden files

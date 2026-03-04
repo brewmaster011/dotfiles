@@ -1,0 +1,4 @@
+# macOS-specific zshrc settings
+
+# uv/uvx - Python package manager PATH
+. "$HOME/.local/bin/env"

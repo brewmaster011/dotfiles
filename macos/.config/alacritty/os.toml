@@ -1,0 +1,7 @@
+# macOS-specific Alacritty window settings
+[window]
+decorations = "Buttonless"
+dynamic_padding = false
+blur = true
+startup_mode = "Maximized"
+option_as_alt = "Both"
