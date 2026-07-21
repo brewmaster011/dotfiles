@@ -8,3 +8,6 @@ zstyle ':fzf-tab:complete:systemctl-*:*' fzf-preview 'SYSTEMD_COLORS=1 systemctl
 
 # opencode (installed via install script, not brew)
 export PATH="$HOME/.opencode/bin:$PATH"
+
+# Go (Linux manual install; macOS uses Homebrew's go)
+export PATH="/usr/local/go/bin:$PATH"

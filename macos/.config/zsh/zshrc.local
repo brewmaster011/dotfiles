@@ -2,3 +2,9 @@
 
 # uv/uvx - Python package manager PATH
 . "$HOME/.local/bin/env"
+
+# .NET Aspire CLI
+export PATH="$HOME/.aspire/bin:$PATH"
+
+# Argo CLI completion
+[[ -f ~/.config/zsh/argo_autocomplete ]] && source ~/.config/zsh/argo_autocomplete

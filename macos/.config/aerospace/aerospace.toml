@@ -73,12 +73,12 @@ automatically-unhide-macos-hidden-apps = false
     9 = 'main'
     
     # QWERT workspaces
-    # Home: LG ULTRAWIDE | Office: DELL U2422HE
-    Q = ['^LG.*', '^DELL U2422HE$', 'secondary', 'main']
-    W = ['^LG.*', '^DELL U2422HE$', 'secondary', 'main']
-    E = ['^LG.*', '^DELL U2422HE$', 'secondary', 'main']
-    R = ['^LG.*', '^DELL U2422HE$', 'secondary', 'main']
-    T = ['^LG.*', '^DELL U2422HE$', 'secondary', 'main']
+    # Home: Samsung Odyssey G81SF (4K) | Office: DELL U2422HE
+    Q = ['^Odyssey G81SF$', '^DELL U2422HE$', 'secondary', 'main']
+    W = ['^Odyssey G81SF$', '^DELL U2422HE$', 'secondary', 'main']
+    E = ['^Odyssey G81SF$', '^DELL U2422HE$', 'secondary', 'main']
+    R = ['^Odyssey G81SF$', '^DELL U2422HE$', 'secondary', 'main']
+    T = ['^Odyssey G81SF$', '^DELL U2422HE$', 'secondary', 'main']
     
     # ASDFG workspaces
     # Home: LEN T24i-20 | Office: DELL U2422H

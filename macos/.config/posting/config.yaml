@@ -1,0 +1,9 @@
+theme: gruvbox
+layout: vertical
+spacing: compact
+use_host_environment: true
+watch_env_files: true
+animation: "full"
+editor: "nvim"
+pager: "bat"
+pager_json: "jq"

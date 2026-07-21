@@ -172,7 +172,7 @@ fzf_cd() {
 zle -N fzf_cd
 bindkey '^g' fzf_cd
 
-export PATH="$HOME/.cargo/bin:$HOME/.dotnet:/usr/local/go/bin:$PATH"
+export PATH="$HOME/.cargo/bin:$HOME/.dotnet:$PATH"
 export DOTNET_ROOT="$HOME/.dotnet"
 export FZF_DEFAULT_OPTS='--height 30% --layout=reverse --border'
 export ZSH_COMPDUMP="$HOME/.cache/zsh/zcompdump"
