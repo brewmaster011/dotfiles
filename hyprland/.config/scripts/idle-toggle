@@ -1,0 +1,16 @@
+#!/bin/sh
+# Toggle hypridle between the default and relaxed timeout profiles by
+# restarting it with the corresponding config. The running profile is
+# identifiable from hypridle's command line.
+
+RELAXED="$HOME/.config/hypr/hypridle-relaxed.conf"
+
+if pgrep -x hypridle -a | grep -q relaxed; then
+    pkill -x hypridle
+    hypridle >/dev/null 2>&1 &
+    notify-send "Idle timeouts: default" "Lock 7m, screen off 8m, suspend 10m"
+else
+    pkill -x hypridle
+    hypridle --config "$RELAXED" >/dev/null 2>&1 &
+    notify-send "Idle timeouts: relaxed" "Screen off 20m, lock 45m, suspend 60m"
+fi
