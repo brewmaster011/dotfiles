@@ -14,30 +14,29 @@ require('gitsigns').setup({
       if vim.wo.diff then return ']c' end
       vim.schedule(function() gs.next_hunk() end)
       return '<Ignore>'
-    end, {expr=true})
+    end, { expr = true, desc = 'Next hunk' })
 
     map('n', '[c', function()
       if vim.wo.diff then return '[c' end
       vim.schedule(function() gs.prev_hunk() end)
       return '<Ignore>'
-    end, {expr=true})
+    end, { expr = true, desc = 'Previous hunk' })
 
     -- Actions
-    -- map('n', '<leader>gs', gs.stage_hunk)
-    -- map('n', '<leader>gr', gs.reset_hunk)
-    -- map('v', '<leader>gs', function() gs.stage_hunk {vim.fn.line('.'), vim.fn.line('v')} end)
-    -- map('v', '<leader>gr', function() gs.reset_hunk {vim.fn.line('.'), vim.fn.line('v')} end)
-    -- map('n', '<leader>gS', gs.stage_buffer)
-    -- map('n', '<leader>gu', gs.undo_stage_hunk)
-    -- map('n', '<leader>gR', gs.reset_buffer)
-    map('n', '<leader>gp', gs.preview_hunk)
-    map('n', '<leader>gb', function() gs.blame_line{full=true} end)
-    map('n', '<leader>gbt', gs.toggle_current_line_blame)
+    map('n', '<leader>gs', gs.stage_hunk, { desc = 'Stage hunk' })
+    map('n', '<leader>gr', gs.reset_hunk, { desc = 'Reset hunk' })
+    map('v', '<leader>gs', function() gs.stage_hunk { vim.fn.line('.'), vim.fn.line('v') } end, { desc = 'Stage hunk' })
+    map('v', '<leader>gr', function() gs.reset_hunk { vim.fn.line('.'), vim.fn.line('v') } end, { desc = 'Reset hunk' })
+    map('n', '<leader>gS', gs.stage_buffer, { desc = 'Stage buffer' })
+    map('n', '<leader>gu', gs.undo_stage_hunk, { desc = 'Undo stage hunk' })
+    map('n', '<leader>gp', gs.preview_hunk, { desc = 'Preview hunk' })
+    map('n', '<leader>gb', function() gs.blame_line{full=true} end, { desc = 'Blame line' })
+    map('n', '<leader>gbt', gs.toggle_current_line_blame, { desc = 'Toggle line blame' })
     -- map('n', '<leader>gd', gs.diffthis)
     -- map('n', '<leader>gD', function() gs.diffthis('~') end)
     -- map('n', '<leader>ge', gs.toggle_deleted)
 
     -- Text object
-    map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
+    map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = 'Select hunk' })
   end
 })

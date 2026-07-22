@@ -1,36 +1,37 @@
 -- Keyboard Remaps
 vim.g.mapleader = " "
 
--- NerdTree
-vim.keymap.set("n", "<leader>b", vim.cmd.NvimTreeToggle)
-
--- Telescope
-vim.keymap.set("n", "<leader>m", ":Telescope marks<CR>")
+-- File tree
+vim.keymap.set("n", "<leader>b", vim.cmd.NvimTreeToggle, { desc = "Toggle file tree" })
 
 -- Move between splits
-vim.keymap.set("n", "<C-h>", "<C-w>h")
-vim.keymap.set("n", "<C-j>", "<C-w>j")
-vim.keymap.set("n", "<C-k>", "<C-w>k")
-vim.keymap.set("n", "<C-l>", "<C-w>l")
+vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Focus left split" })
+vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Focus lower split" })
+vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Focus upper split" })
+vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Focus right split" })
 
--- Yank and Paste to system clipboard
-vim.keymap.set("v", "<leader>y", '"+y')
-vim.keymap.set("n", "<leader>y", '"+y')
-vim.keymap.set("v", "<leader>p", '"+p')
-vim.keymap.set("n", "<leader>p", '"+p')
+-- Yank and paste to system clipboard
+vim.keymap.set("v", "<leader>y", '"+y', { desc = "Yank to system clipboard" })
+vim.keymap.set("n", "<leader>y", '"+y', { desc = "Yank to system clipboard" })
+vim.keymap.set("v", "<leader>p", '"+p', { desc = "Paste from system clipboard" })
+vim.keymap.set("n", "<leader>p", '"+p', { desc = "Paste from system clipboard" })
 
--- Location List
-vim.keymap.set("n", "<leader>ll", ":lopen<CR>")
-vim.keymap.set("n", "<leader>lq", ":lclose<CR>")
-vim.keymap.set("n", "<leader>ln", ":lnext<CR>")
-vim.keymap.set("n", "<leader>lp", ":lprevious<CR>")
-vim.keymap.set("n", "<leader>lo", ":lolder<CR>")
-vim.keymap.set("n", "<leader>ln", ":lnewer<CR>")
+-- Location list
+vim.keymap.set("n", "<leader>ll", ":lopen<CR>", { desc = "Open location list" })
+vim.keymap.set("n", "<leader>lq", ":lclose<CR>", { desc = "Close location list" })
+vim.keymap.set("n", "<leader>ln", ":lnext<CR>", { desc = "Next location-list item" })
+vim.keymap.set("n", "<leader>lp", ":lprevious<CR>", { desc = "Previous location-list item" })
+vim.keymap.set("n", "<leader>lo", ":lolder<CR>", { desc = "Older location list" })
+vim.keymap.set("n", "<leader>lN", ":lnewer<CR>", { desc = "Newer location list" })
+vim.keymap.set("n", "<leader>ld", vim.diagnostic.setloclist, { desc = "Diagnostics to location list" })
+
+-- Quickfix list
+vim.keymap.set("n", "<leader>qo", ":copen<CR>", { desc = "Open quickfix list" })
+vim.keymap.set("n", "<leader>qc", ":cclose<CR>", { desc = "Close quickfix list" })
+vim.keymap.set("n", "<leader>qn", ":cnext<CR>", { desc = "Next quickfix item" })
+vim.keymap.set("n", "<leader>qp", ":cprevious<CR>", { desc = "Previous quickfix item" })
+vim.keymap.set("n", "<leader>qd", vim.diagnostic.setqflist, { desc = "Diagnostics to quickfix list" })
 
 -- Misc
-
--- Format json with jq
-vim.keymap.set("n", "<leader>jq", ":%!jq<CR>")
-
--- Disable Search Highligting
-vim.keymap.set("n", "<leader>n", ":noh<CR>")
+vim.keymap.set("n", "<leader>jq", ":%!jq<CR>", { desc = "Format JSON with jq" })
+vim.keymap.set("n", "<leader>n", ":noh<CR>", { desc = "Clear search highlight" })

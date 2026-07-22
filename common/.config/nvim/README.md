@@ -79,30 +79,44 @@ Managed via Mason. Configured in `after/plugin/lsp.lua` with custom settings in 
 |-----|------|--------|
 | `<leader>ll` | Normal | Open location list |
 | `<leader>lq` | Normal | Close location list |
-| `<leader>ln` | Normal | Next location |
-| `<leader>lp` | Normal | Previous location |
-| `<leader>lo` | Normal | Older location list |
+| `<leader>ln` / `<leader>lp` | Normal | Next / previous item |
+| `<leader>lo` / `<leader>lN` | Normal | Older / newer location list |
+| `<leader>ld` | Normal | Current-buffer diagnostics to location list |
+
+### Quickfix List
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `<leader>qo` / `<leader>qc` | Normal | Open / close quickfix list |
+| `<leader>qn` / `<leader>qp` | Normal | Next / previous item |
+| `<leader>qd` | Normal | Workspace diagnostics to quickfix list |
 
 ### Telescope (Fuzzy Finder)
 
 | Key | Mode | Action |
 |-----|------|--------|
-| `Ctrl+p` | Normal | Find files (includes hidden) |
-| `<leader>ff` | Normal | Find files (includes hidden) |
-| `<leader>gf` | Normal | Find git files |
-| `Ctrl+f` | Normal | Live grep (search content) |
-| `<leader>fr` | Normal | LSP references |
+| `Ctrl+p` / `<leader>ff` | Normal | Find files (includes hidden) |
+| `<leader>gf` | Normal | Find Git files |
+| `Ctrl+f` / `<leader>fg` | Normal | Live grep |
+| `<leader>fw` | Normal | Grep word under cursor |
+| `<leader>fb` | Normal | Find open buffers |
+| `<leader>fo` | Normal | Find recently opened files |
+| `<leader>fh` | Normal | Find help tags |
+| `<leader>fr` | Normal | Interactive LSP references |
 | `<leader>fm` | Normal | Marks |
-| `<leader>m` | Normal | Marks (alternate) |
+
+Within a Telescope picker, `Ctrl+q` sends all results to quickfix and `Alt+q` sends selected results.
 
 ### LSP (active when LSP attached)
 
 | Key | Mode | Action |
 |-----|------|--------|
-| `<leader>d` | Normal | Go to definition |
-| `<leader>i` | Normal | Go to implementation |
+| `<leader>d` / `<leader>D` | Normal | Go to definition / declaration |
+| `<leader>i` / `<leader>t` | Normal | Go to implementation / type definition |
 | `<leader>k` | Normal | Hover documentation |
+| `<leader>r` / `<leader>lr` | Normal | References in quickfix / location list |
 | `<leader>e` | Normal | Show diagnostic float |
+| `[d` / `]d` | Normal | Previous / next diagnostic |
 | `<space>rn` | Normal | Rename symbol |
 | `<space>ca` | Normal | Code actions |
 | `<space>f` | Normal | Format buffer |
@@ -127,11 +141,12 @@ Managed via Mason. Configured in `after/plugin/lsp.lua` with custom settings in 
 
 | Key | Mode | Action |
 |-----|------|--------|
-| `]c` | Normal | Next hunk |
-| `[c` | Normal | Previous hunk |
+| `]c` / `[c` | Normal | Next / previous hunk |
+| `<leader>gs` / `<leader>gr` | Normal/Visual | Stage / reset hunk |
+| `<leader>gS` | Normal | Stage buffer |
+| `<leader>gu` | Normal | Undo staged hunk |
 | `<leader>gp` | Normal | Preview hunk |
-| `<leader>gb` | Normal | Blame line (full) |
-| `<leader>gbt` | Normal | Toggle current line blame |
+| `<leader>gb` / `<leader>gbt` | Normal | Blame line / toggle inline blame |
 | `ih` | Visual/Operator | Select hunk (text object) |
 
 ## Directory Structure
