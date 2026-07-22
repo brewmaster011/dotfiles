@@ -8,5 +8,6 @@ neovim
 zsh
 fzf
 ripgrep
+fd
 eza
 zellij

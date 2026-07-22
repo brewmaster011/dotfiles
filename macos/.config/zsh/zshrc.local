@@ -1,16 +1,16 @@
 # macOS-specific zshrc settings
 
 # uv/uvx - Python package manager PATH
-. "$HOME/.local/bin/env"
+[[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
 
 # .NET Aspire CLI
 export PATH="$HOME/.aspire/bin:$PATH"
+
+# Project directory for the ^g fzf project-jump widget
+export PROJECTS_DIR="$HOME/Documents/src"
 
 # Argo CLI completion
 [[ -f ~/.config/zsh/argo_autocomplete ]] && source ~/.config/zsh/argo_autocomplete
 
 # pi coding agent - use XDG config dir instead of ~/.pi
 export PI_CODING_AGENT_DIR="$HOME/.config/pi/agent"
-
-# Ctrl-f: cd into the directory of an fzf-selected file
-bindkey -s '^f' '^ucd "$(dirname "$(fzf)")"\n'

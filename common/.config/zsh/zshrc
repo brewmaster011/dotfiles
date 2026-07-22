@@ -134,10 +134,10 @@ bindkey -s '^f' '^ucd "$(dirname "$(fzf)")"\n'
 # fzf_cd: fuzzy find a project directory, then pick a git worktree if available
 fzf_cd() {
 
-  local repo
+  local repo wt_list wt
 
   repo=$(
-    fd --type d --max-depth 1 '' ~/Documents/src \
+    fd --type d --max-depth 1 '' "${PROJECTS_DIR:-$HOME/Documents/source}" \
       | fzf --prompt "Select Directory"
   )
 

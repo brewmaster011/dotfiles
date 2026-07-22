@@ -11,3 +11,6 @@ export PATH="$HOME/.opencode/bin:$PATH"
 
 # Go (Linux manual install; macOS uses Homebrew's go)
 export PATH="/usr/local/go/bin:$PATH"
+
+# Project directory for the ^g fzf project-jump widget
+export PROJECTS_DIR="$HOME/Documents/src"
