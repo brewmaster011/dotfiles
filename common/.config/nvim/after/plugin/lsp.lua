@@ -61,8 +61,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
         map("<leader>r", vim.lsp.buf.references, "Find references in quickfix list")
         map("<leader>lr", function() vim.lsp.buf.references(nil, { loclist = true }) end, "Find references in location list")
         map("<leader>e", vim.diagnostic.open_float, "Show diagnostic")
-        map("[d", vim.diagnostic.goto_prev, "Previous diagnostic")
-        map("]d", vim.diagnostic.goto_next, "Next diagnostic")
+        map("[d", function() vim.diagnostic.jump({ count = -1, float = true }) end, "Previous diagnostic")
+        map("]d", function() vim.diagnostic.jump({ count = 1, float = true }) end, "Next diagnostic")
 
         map("<leader>rn", vim.lsp.buf.rename, "Rename symbol")
         map("<leader>ca", vim.lsp.buf.code_action, "Code actions")

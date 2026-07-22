@@ -117,9 +117,9 @@ Within a Telescope picker, `Ctrl+q` sends all results to quickfix and `Alt+q` se
 | `<leader>r` / `<leader>lr` | Normal | References in quickfix / location list |
 | `<leader>e` | Normal | Show diagnostic float |
 | `[d` / `]d` | Normal | Previous / next diagnostic |
-| `<space>rn` | Normal | Rename symbol |
-| `<space>ca` | Normal | Code actions |
-| `<space>f` | Normal | Format buffer |
+| `<leader>rn` | Normal | Rename symbol |
+| `<leader>ca` | Normal | Code actions |
+| `<leader>f` | Normal | Format buffer |
 
 ### Completion (nvim-cmp)
 
