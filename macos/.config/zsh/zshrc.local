@@ -8,3 +8,9 @@ export PATH="$HOME/.aspire/bin:$PATH"
 
 # Argo CLI completion
 [[ -f ~/.config/zsh/argo_autocomplete ]] && source ~/.config/zsh/argo_autocomplete
+
+# pi coding agent - use XDG config dir instead of ~/.pi
+export PI_CODING_AGENT_DIR="$HOME/.config/pi/agent"
+
+# Ctrl-f: cd into the directory of an fzf-selected file
+bindkey -s '^f' '^ucd "$(dirname "$(fzf)")"\n'
