@@ -108,7 +108,6 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
 # switch group using `,` and `.`
 zstyle ':fzf-tab:*' switch-group ',' '.'
 # extra configuration for fzf-tab
-zstyle ':fzf-tab:complete:systemctl-*:*' fzf-preview 'SYSTEMD_COLORS=1 systemctl status $word'
 zstyle ':fzf-tab:*' continous-trigger '/'
 zstyle ':fzf-tab:*' fzf-pad 4
 
@@ -131,12 +130,54 @@ bindkey -s '^n' '^unotes\n'
 
 # cd Fuzzy Finder
 bindkey -s '^f' '^ucd "$(dirname "$(fzf)")"\n'
-bindkey -s '^g' '^ucd "$(find ~/Documents/source -maxdepth 1 -mindepth 1 -type d | fzf)"\n'
-export PATH="$HOME/.cargo/bin:$HOME/.dotnet:/usr/local/go/bin:$PATH"
+
+# fzf_cd: fuzzy find a project directory, then pick a git worktree if available
+fzf_cd() {
+
+  local repo wt_list wt
+
+  repo=$(
+    fd --type d --max-depth 1 '' "${PROJECTS_DIR:-$HOME/Documents/source}" \
+      | fzf --prompt "Select Directory"
+  )
+
+  if [[ -z $repo ]]; then
+      zle reset-prompt
+      return 1
+  fi
+
+  wt_list=(
+    ${(f)"$(git -C "${repo}" worktree list --porcelain 2>/dev/null)"}
+  )
+
+  if (( ${#wt_list[@]} )); then
+    wt=$(
+      printf "%s\n" "${wt_list[@]}" \
+        | awk '/^worktree / { print $2 }' \
+        | fzf --prompt="Select Worktree (esc = master/main)> "
+    )
+  fi
+
+  if [[ -n $wt ]]; then
+    cd -- "$wt"
+  else
+    cd -- "$repo"
+    cd main 2>/dev/null || cd master 2>/dev/null || true
+  fi
+
+  zle reset-prompt
+  return 0
+}
+
+zle -N fzf_cd
+bindkey '^g' fzf_cd
+
+export PATH="$HOME/.cargo/bin:$HOME/.dotnet:$HOME/.dotnet/tools:$PATH"
 export DOTNET_ROOT="$HOME/.dotnet"
 export FZF_DEFAULT_OPTS='--height 30% --layout=reverse --border'
 export ZSH_COMPDUMP="$HOME/.cache/zsh/zcompdump"
 
-export MOZ_USE_XINPUT2=1
+eval "$(fzf --zsh)"
 
-source "$HOME/.config/zsh/.fzf.zsh"
+# Source OS-specific settings
+[[ -f ~/.config/zsh/zshrc.local ]] && source ~/.config/zsh/zshrc.local

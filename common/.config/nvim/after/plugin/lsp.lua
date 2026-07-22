@@ -10,7 +10,6 @@ require("mason-lspconfig").setup({
         "lua_ls",
         "csharp_ls",
         "intelephense",
-        "spectral",
         "dockerls",
         "ltex",
         "pylsp",
@@ -50,14 +49,23 @@ vim.api.nvim_create_autocmd("LspAttach", {
     callback = function(args)
         local bufnr = args.buf
         local opts = { buffer = bufnr, remap = false }
+        local function map(lhs, rhs, desc)
+            vim.keymap.set("n", lhs, rhs, vim.tbl_extend("force", opts, { desc = desc }))
+        end
 
-        vim.keymap.set("n", "<leader>d", vim.lsp.buf.definition, opts)
-        vim.keymap.set("n", "<leader>k", vim.lsp.buf.hover, opts)
-        vim.keymap.set("n", "<leader>i", vim.lsp.buf.implementation, opts)
-        vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, opts)
+        map("<leader>d", vim.lsp.buf.definition, "Go to definition")
+        map("<leader>D", vim.lsp.buf.declaration, "Go to declaration")
+        map("<leader>i", vim.lsp.buf.implementation, "Go to implementation")
+        map("<leader>t", vim.lsp.buf.type_definition, "Go to type definition")
+        map("<leader>k", vim.lsp.buf.hover, "Hover documentation")
+        map("<leader>r", vim.lsp.buf.references, "Find references in quickfix list")
+        map("<leader>lr", function() vim.lsp.buf.references(nil, { loclist = true }) end, "Find references in location list")
+        map("<leader>e", vim.diagnostic.open_float, "Show diagnostic")
+        map("[d", function() vim.diagnostic.jump({ count = -1, float = true }) end, "Previous diagnostic")
+        map("]d", function() vim.diagnostic.jump({ count = 1, float = true }) end, "Next diagnostic")
 
-        vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, opts)
-        vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action, opts)
-        vim.keymap.set("n", "<space>f", function() vim.lsp.buf.format({ async = true }) end, opts)
+        map("<leader>rn", vim.lsp.buf.rename, "Rename symbol")
+        map("<leader>ca", vim.lsp.buf.code_action, "Code actions")
+        map("<leader>f", function() vim.lsp.buf.format({ async = true }) end, "Format buffer")
     end,
 })

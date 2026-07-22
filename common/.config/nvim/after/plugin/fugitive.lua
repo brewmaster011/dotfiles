@@ -1,2 +1,2 @@
 -- vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
-vim.keymap.set("n", "gs", ':tab Git<CR>')
+vim.keymap.set("n", "gs", ':tab Git<CR>', { desc = "Open Git status" })

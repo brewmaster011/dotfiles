@@ -2,6 +2,12 @@
 -- ABOUTME: Custom formatting with lspkind and highlight groups for completion menu
 
 local cmp = require("cmp")
+local lspkind = require("lspkind")
+
+lspkind.setup({
+    mode = "symbol_text",
+    symbol_map = { Copilot = "" },
+})
 
 cmp.setup({
     snippet = {
@@ -38,16 +44,14 @@ cmp.setup({
     formatting = {
         fields = { "kind", "abbr", "menu" },
         format = function(entry, vim_item)
-            local kind = require("lspkind").cmp_format({
-                mode = "symbol_text",
+            local kind_name = vim_item.kind:match("([^%s]+)$") or vim_item.kind
+            local icon = lspkind.symbolic(kind_name)
+            local kind = lspkind.cmp_format({
                 maxwidth = 50,
-                symbol_map = { Copilot = "" },
             })(entry, vim_item)
 
-            local strings = vim.split(kind.kind, "%s", { trimempty = true })
-
-            kind.kind = " " .. (strings[1] or "") .. " "
-            kind.menu = "    (" .. (strings[2] or "") .. ")"
+            kind.kind = " " .. icon .. " "
+            kind.menu = "    (" .. kind_name .. ")"
             return kind
         end,
     },
