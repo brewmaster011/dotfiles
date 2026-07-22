@@ -10,7 +10,6 @@ require("mason-lspconfig").setup({
         "lua_ls",
         "csharp_ls",
         "intelephense",
-        "spectral",
         "dockerls",
         "ltex",
         "pylsp",

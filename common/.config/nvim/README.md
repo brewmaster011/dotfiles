@@ -49,7 +49,6 @@ Managed via Mason. Configured in `after/plugin/lsp.lua` with custom settings in 
 | `intelephense` | PHP | |
 | `dockerls` | Dockerfile | |
 | `ltex` | LaTeX/Markdown | Prose linting (en-GB) |
-| `spectral` | OpenAPI | API linting |
 
 ## Keybindings
 
