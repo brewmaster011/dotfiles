@@ -1,15 +1,31 @@
 #!/bin/sh
+# ABOUTME: dwmblocks battery indicator
+# ABOUTME: Auto-detects the first battery under /sys/class/power_supply
 
-STATUS=$(cat /sys/class/power_supply/BAT1/status)
-CHARGE=$(cat /sys/class/power_supply/BAT1/capacity)
+# Framework reports BAT1, the uConsole reports axp20x-battery, so find the
+# battery rather than hardcoding a device name.
+for supply in /sys/class/power_supply/*/; do
+    [ -r "$supply/type" ] || continue
+    [ "$(cat "$supply/type")" = "Battery" ] || continue
+    BATTERY="$supply"
+    break
+done
 
-case $STATUS in
+# No battery (desktop) - print nothing
+[ -n "$BATTERY" ] || exit 0
+
+STATUS="$(cat "$BATTERY/status")"
+CHARGE="$(cat "$BATTERY/capacity")"
+
+case "$STATUS" in
     "Charging")
         ICON="󰂄"
         ;;
     "Not charging")
         ICON="󱈑"
-        #CHARGE=$(acpi | grep "Battery 0" | awk '{print $5}' | sed 's/\%,//g;s/%//g')
+        ;;
+    "Full")
+        ICON="󰁹"
         ;;
     "Discharging")
         [ "$CHARGE" -ge 95 ] && ICON="󰁹"
@@ -24,11 +40,9 @@ case $STATUS in
         [ "$CHARGE" -lt 20 ] && [ "$CHARGE" -ge 15 ] && ICON="󰁺"
         [ "$CHARGE" -lt 15 ] && ICON="󰂃"
         ;;
-    "Full")
-	ICON="󰁹"
-	;;
     *)
+        ICON="󰁽"
         ;;
 esac
 
-echo "$ICON $CHARGE%"
+printf "%s %s%%" "$ICON" "$CHARGE"

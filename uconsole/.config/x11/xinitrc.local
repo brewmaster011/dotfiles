@@ -1,0 +1,6 @@
+#!/bin/sh
+# ABOUTME: ClockworkPi uConsole X session tweaks, sourced by dwm/.xinitrc
+# ABOUTME: Rotates the DSI panel into its landscape orientation
+
+# The uConsole's DSI panel is mounted rotated; put it back to landscape.
+xrandr --output DSI-1 --primary --rotate right

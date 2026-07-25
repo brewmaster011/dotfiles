@@ -12,6 +12,7 @@ Linux-specific configurations for desktop systems. Includes keyboard remapping, 
 | `neofetch/` | System info display |
 | `runit/` | User services (SSH agent) |
 | `scripts/` | Statusbar scripts, playerctl hooks |
+| `feh/` | Wallpaper setter (`fehbg`) |
 
 ## Kanata (Keyboard Remapper)
 
@@ -115,12 +116,19 @@ runsvdir $HOME/.config/runit/runsvdir/current &
 
 ### Statusbar (`scripts/statusbar/`)
 
-Scripts for dwm status bar (dwmblocks):
-- `battery` - Battery percentage and status
-- `brightness` - Screen brightness
-- `datetime` - Date and time
-- `volume` - Audio volume
-- `misc` - Miscellaneous info
+Scripts for the dwm status bar (dwmblocks):
+
+| Script | Shows | Notes |
+|--------|-------|-------|
+| `battery.sh` | Charge level and state | Auto-detects the battery under `/sys/class/power_supply` (BAT1, axp20x-battery, ...); prints nothing on desktops |
+| `brightness.sh` | Screen brightness | Reads percentages from `brightnessctl`, so it works on any backlight scale; appends keyboard backlight where present |
+| `volume.sh` | Volume / mute | Via `pamixer` |
+| `wifi.sh` | Wifi signal strength | Plus a lock icon when a VPN tunnel is up |
+| `datetime.sh` | Date and time | |
+| `misc/player` | Now playing | Via `playerctl` |
+
+These are hardware-agnostic on purpose - the same scripts run on the Framework
+laptop and the uConsole with no per-device overrides.
 
 ### Playerctl (`scripts/playerctl/`)
 
@@ -136,3 +144,6 @@ Scripts for dwm status bar (dwmblocks):
 | neofetch | `neofetch` | System info |
 | runit | `runit` | Service manager |
 | playerctl | `playerctl` | Media controls |
+| brightnessctl | `brightnessctl` | Statusbar brightness |
+| pamixer | `pamixer` | Statusbar volume |
+| feh | `feh` | Wallpaper |

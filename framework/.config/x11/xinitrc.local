@@ -1,0 +1,6 @@
+#!/bin/sh
+# ABOUTME: Framework Laptop 14 X session tweaks, sourced by dwm/.xinitrc
+# ABOUTME: Applies the panel colour calibration profile
+
+# Colour calibration for the Framework Laptop 14 panel
+xcalib -v "$HOME/.config/color-calibration/BOE_CQ_______NE135FBM_N41_03.icm"
