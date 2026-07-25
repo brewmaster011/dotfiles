@@ -59,11 +59,12 @@ git submodule update --init --recursive
 echo ""
 echo "Available stow packages:"
 echo "  common     - Cross-platform (nvim, zsh, alacritty, zellij)"
-echo "  linux      - Linux-only (dunst, kanata, ranger, neofetch, runit, scripts)"
+echo "  linux      - Linux-only (dunst, kanata, ranger, neofetch, runit, scripts, wallpaper)"
 echo "  macos      - macOS-specific (aerospace)"
-echo "  hyprland   - Hyprland/Wayland (hypr, waybar, wofi, feh)"
-echo "  dwm        - X11/dwm (picom, xmodmap, .xinitrc)"
-echo "  framework  - Framework laptop (color-calibration, easyeffects)"
+echo "  hyprland   - Hyprland/Wayland (hypr, waybar, wofi)"
+echo "  dwm        - X11/dwm (picom, .xinitrc)"
+echo "  framework  - Framework laptop (color-calibration, easyeffects, thermal aliases)"
+echo "  uconsole   - ClockworkPi uConsole (DSI panel rotation)"
 echo ""
 
 if [[ "$OS_TYPE" == "macos" ]]; then
@@ -78,7 +79,13 @@ else
     echo "Examples:"
     echo "  Framework laptop with Hyprland: common linux hyprland framework"
     echo "  Desktop with dwm: common linux dwm"
+    echo "  ClockworkPi uConsole: common linux dwm uconsole"
     echo ""
+    if [[ -d /sys/class/power_supply/axp20x-battery ]]; then
+        echo "  Detected axp20x battery - this looks like a uConsole."
+        echo "  Suggested: common linux dwm uconsole"
+        echo ""
+    fi
     read -p "Enter packages to install (space-separated): " PACKAGES
 fi
 

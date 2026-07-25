@@ -7,6 +7,12 @@ kanata
 ranger
 neofetch
 
+# Statusbar script dependencies
+brightnessctl
+pamixer
+playerctl
+feh
+
 # For Hyprland
 # hyprland
 # waybar
@@ -19,3 +25,5 @@ neofetch
 # picom
 # xorg-server
 # xorg-xinit
+# xss-lock
+# unclutter

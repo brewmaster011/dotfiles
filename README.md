@@ -21,10 +21,11 @@ stow common linux hyprland -t ~
 | Package | Platform | Contents |
 |---------|----------|----------|
 | `common` | All | Neovim, Zsh, Alacritty, Zellij |
-| `linux` | Linux | Dunst, Kanata, Ranger, Neofetch, Runit services, Scripts |
+| `linux` | Linux | Dunst, Kanata, Ranger, Neofetch, Runit services, Scripts, Wallpaper |
 | `hyprland` | Linux | Hyprland, Waybar, Wofi, Hyprlock, Hypridle, Hyprpaper |
-| `dwm` | Linux | Picom, Xmodmap, .xinitrc |
-| `framework` | Linux | Color calibration (ICC profile), EasyEffects preset |
+| `dwm` | Linux | Picom, .xinitrc |
+| `framework` | Linux | Color calibration (ICC profile), EasyEffects preset, thermal aliases |
+| `uconsole` | Linux | ClockworkPi uConsole DSI panel rotation |
 | `macos` | macOS | AeroSpace, Alacritty, Kanata, btop, posting, Zsh, git ignore, shell profile |
 | `scripts` | N/A | Bootstrap script, Makefile, package lists (not stowed) |
 
@@ -36,6 +37,9 @@ make stow PACKAGES='common linux hyprland framework'
 
 # Desktop with dwm (X11)
 make stow PACKAGES='common linux dwm'
+
+# ClockworkPi uConsole (X11 handheld)
+make stow PACKAGES='common linux dwm uconsole'
 
 # Raspberry Pi / Headless server
 make stow PACKAGES='common linux'
@@ -65,26 +69,31 @@ dotfiles/
 │       ├── neofetch/       # System info
 │       ├── runit/          # User services (SSH agent)
 │       ├── scripts/        # Statusbar, playerctl hooks
+│       ├── feh/            # Wallpaper setter (fehbg)
 │       └── zsh/            # Linux-only aliases + zshrc.local
+│   └── Pictures/wallpaper/ # Wallpaper images
 │
 ├── hyprland/               # Hyprland (Wayland)
 │   ├── .config/
 │   │   ├── hypr/           # Hyprland, hyprlock, hypridle, hyprpaper
 │   │   ├── waybar/         # Status bar
-│   │   ├── wofi/           # App launcher
-│   │   └── feh/            # Wallpaper (fallback)
-│   └── Pictures/wallpaper/ # Wallpaper images
+│   │   └── wofi/           # App launcher
 │
 ├── dwm/                    # dwm (X11)
-│   ├── .xinitrc            # X session startup
+│   ├── .xinitrc            # X session startup (sources ~/.config/x11/xinitrc.local)
 │   └── .config/
-│       ├── picom/          # Compositor
-│       └── xmodmap/        # Keyboard mapping
+│       └── picom/          # Compositor
 │
 ├── framework/              # Framework laptop
 │   └── .config/
 │       ├── color-calibration/  # ICC profile
-│       └── easyeffects/        # Audio preset
+│       ├── easyeffects/        # Audio preset
+│       ├── x11/                # xinitrc.local - applies ICC profile
+│       └── zsh/                # Thermal / power profile aliases
+│
+├── uconsole/               # ClockworkPi uConsole
+│   └── .config/
+│       └── x11/            # xinitrc.local - rotates the DSI panel
 │
 ├── macos/                  # macOS
 │   ├── .zprofile           # Homebrew shellenv + nvm
@@ -127,7 +136,13 @@ dotfiles/
 ### Linux (dwm)
 - dwm, dwmblocks, slock (compiled separately)
 - Picom, Dunst
-- X11, xinit
+- X11, xinit, xss-lock, unclutter
+- [brightnessctl](https://github.com/Hummer12007/brightnessctl), [pamixer](https://github.com/cdemoulins/pamixer), feh (statusbar scripts and wallpaper)
+
+### Linux (ClockworkPi uConsole)
+- Everything from the dwm list above
+- dunst **>= 1.9** - Debian 11 ships 1.5.0, which cannot read the shared
+  `linux/` dunstrc. See [uconsole/README.md](uconsole/README.md).
 
 ### macOS
 - [Homebrew](https://brew.sh/)
@@ -178,6 +193,8 @@ git config --global user.email "you@example.com"
 - [Linux Package](linux/README.md) - Kanata, Dunst, Ranger, scripts
 - [Hyprland Package](hyprland/README.md) - Keybindings, Waybar, Wofi
 - [dwm Package](dwm/README.md) - .xinitrc, Picom, dependencies
+- [Framework Package](framework/README.md) - Colour calibration, thermal aliases
+- [uConsole Package](uconsole/README.md) - Hardware notes, dunst caveat
 - [Scripts](scripts/README.md) - install.sh, Makefile, package lists
 
 ## License
