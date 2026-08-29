@@ -141,13 +141,13 @@ Click actions:
 
 ## Environment Variables
 
-Notable variables set in hyprland.conf:
+Notable variables set in hyprland.lua:
 
 - `SSH_AUTH_SOCK` - SSH agent socket
-- `SSH_ASKPASS` - ksshaskpass for GUI prompts
+- `SSH_ASKPASS` - wofi-based askpass script for GUI prompts
 - `GRIM_DEFAULT_DIR` - Screenshot directory
 - `GTK_THEME` / `ICON_THEME` - Sweet-mars / Papirus-Dark
-- `GDK_SCALE` / `QT_SCALE_FACTOR` - 1.175x scaling
+- Scaling is done per monitor by the compositor (eDP-1 at 1.175); no GDK_SCALE/QT_SCALE_FACTOR
 - `ELECTRON_OZONE_PLATFORM_HINT` - Wayland for Electron apps
 
 ## Requirements
