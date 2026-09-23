@@ -10,17 +10,8 @@ local HOME = os.getenv("HOME")
 --- MONITORS ---
 ----------------
 
--- Monitors are matched by EDID description (stable across ports/replugs),
--- not by DP-N names. Confirm strings with `hyprctl monitors all` when docked.
-hl.monitor({ output = "eDP-1", mode = "2256x1504@60Hz", position = "auto", scale = 1.175 })
--- hl.monitor({ output = "eDP-1", disabled = true })
--- hl.monitor({ output = "desc:Odyssey G81SF", mode = "3840x2160@240", position = "auto", scale = 1.25, vrr = 1 })
--- TODO fill in desc: for these next time they're connected:
--- hl.monitor({ output = "desc:???", mode = "2560x1080@74.99", position = "auto", scale = 1, vrr = 1 })
--- hl.monitor({ output = "desc:Lenovo Group Limited LEN T24i-20 VNA5MNX8", mode = "1920x1080", position = "auto-left", scale = 1, transform = 3 })
--- Fallback for unknown monitors
--- hl.monitor({ output = "", mode = "highres", position = "auto", scale = 1, vrr = 1 })
--- hl.monitor({ output = "", mode = "2560x1080@74.99Hz", position = "auto-up", scale = 1, vrr = 1 })
+-- Monitor layout is per machine: see host.lua in the host stow package
+-- (framework/, cosmo/). It is loaded at the end of this file.
 
 
 -------------------
@@ -203,15 +194,8 @@ hl.config({
         follow_mouse = 1,
 
         sensitivity = 0, -- -1.0 - 1.0, 0 means no modification.
-
-        touchpad = {
-            natural_scroll = false,
-        },
     },
 })
-
--- See https://wiki.hypr.land/Configuring/Gestures
-hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
 
 -- Example per-device config
 -- See https://wiki.hypr.land/Configuring/Keywords/#per-device-input-configs for more
@@ -290,13 +274,11 @@ hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
--- Laptop multimedia keys for volume and LCD brightness (work on the lockscreen, repeat when held)
+-- Multimedia keys (work on the lockscreen, repeat when held)
 hl.bind("XF86AudioRaiseVolume",  hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
 hl.bind("XF86AudioLowerVolume",  hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),      { locked = true, repeating = true })
 hl.bind("XF86AudioMute",         hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),     { locked = true, repeating = true })
 hl.bind("XF86AudioMicMute",      hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),   { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessUp",   hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"),                  { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"),                  { locked = true, repeating = true })
 
 -- Requires playerctl
 hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("playerctl next"),       { locked = true })
@@ -361,3 +343,19 @@ hl.window_rule({
 --     match = { class = "^$", title = "^$", xwayland = true, float = true, fullscreen = false, pin = false },
 --     no_focus = true,
 -- })
+
+
+------------------------
+--- PER-HOST OVERRIDES ---
+------------------------
+
+-- Machine-specific config (monitors, laptop keys, GPU env) lives in the host
+-- stow package and is linked to ~/.config/hypr/host.lua. Missing file is fine.
+do
+    local hostConf = HOME .. "/.config/hypr/host.lua"
+    local f = io.open(hostConf, "r")
+    if f then
+        f:close()
+        dofile(hostConf)
+    end
+end
