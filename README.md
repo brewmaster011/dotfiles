@@ -24,7 +24,8 @@ stow common linux hyprland -t ~
 | `linux` | Linux | Dunst, Kanata, Ranger, Neofetch, Runit services, Scripts |
 | `hyprland` | Linux | Hyprland, Waybar, Wofi, Hyprlock, Hypridle, Hyprpaper |
 | `dwm` | Linux | Picom, Xmodmap, .xinitrc |
-| `framework` | Linux | Color calibration (ICC profile), EasyEffects preset |
+| `framework` | Linux | Framework 13 laptop: Hyprland host.lua (eDP-1, touchpad, brightness keys), waybar battery modules, ICC profile, EasyEffects preset |
+| `cosmo` | Linux | Desktop: Hyprland host.lua (Odyssey G81SF, NVIDIA env), waybar modules |
 | `macos` | macOS | AeroSpace, Alacritty, Kanata, btop, posting, Zsh, git ignore, shell profile |
 | `scripts` | N/A | Bootstrap script, Makefile, package lists (not stowed) |
 
@@ -33,6 +34,9 @@ stow common linux hyprland -t ~
 ```bash
 # Framework laptop with Hyprland (Wayland)
 make stow PACKAGES='common linux hyprland framework'
+
+# cosmo desktop with Hyprland (Wayland, NVIDIA)
+make stow PACKAGES='common linux hyprland cosmo'
 
 # Desktop with dwm (X11)
 make stow PACKAGES='common linux dwm'
@@ -81,10 +85,17 @@ dotfiles/
 │       ├── picom/          # Compositor
 │       └── xmodmap/        # Keyboard mapping
 │
-├── framework/              # Framework laptop
+├── framework/              # Framework laptop (host package)
 │   └── .config/
+│       ├── hypr/host.lua       # Monitors, touchpad, brightness keys
+│       ├── waybar/host.jsonc   # modules-right incl. battery/backlight
 │       ├── color-calibration/  # ICC profile
 │       └── easyeffects/        # Audio preset
+│
+├── cosmo/                  # Desktop (host package)
+│   └── .config/
+│       ├── hypr/host.lua       # Monitor, NVIDIA env vars
+│       └── waybar/host.jsonc   # modules-right
 │
 ├── macos/                  # macOS
 │   ├── .zprofile           # Homebrew shellenv + nvm
@@ -135,6 +146,15 @@ dotfiles/
 - `tree-sitter-cli` (Neovim compiles treesitter parsers with the CLI; the `tree-sitter` formula is library-only)
 - [Kanata](https://github.com/jtroo/kanata) — home-row mods; requires approving the Karabiner system extension and granting Input Monitoring
 - btop (system monitor)
+
+## Per-host config
+
+`hyprland/.config/hypr/hyprland.lua` holds everything shared and ends by loading
+`~/.config/hypr/host.lua` if present. Waybar's `config.jsonc` includes
+`~/.config/waybar/host.jsonc`, which supplies `modules-right`. Each machine
+stows exactly one host package (`framework`, `cosmo`) that provides those two files.
+To add a machine, create `<host>/.config/hypr/host.lua` and
+`<host>/.config/waybar/host.jsonc` and stow it alongside `hyprland`.
 
 ## Shell environment
 

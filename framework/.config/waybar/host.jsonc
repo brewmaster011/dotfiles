@@ -1,0 +1,11 @@
+{
+  "modules-right": [
+    "battery",
+    "power-profiles-daemon",
+    "backlight",
+    "pulseaudio",
+    "bluetooth",
+    "network",
+    "tray"
+  ]
+}
