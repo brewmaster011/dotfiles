@@ -196,15 +196,8 @@ hl.config({
         follow_mouse = 1,
 
         sensitivity = 0, -- -1.0 - 1.0, 0 means no modification.
-
-        touchpad = {
-            natural_scroll = false,
-        },
     },
 })
-
--- See https://wiki.hypr.land/Configuring/Gestures
-hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
 
 -- Example per-device config
 -- See https://wiki.hypr.land/Configuring/Keywords/#per-device-input-configs for more
@@ -217,23 +210,31 @@ hl.device({ name = "epic-mouse-v1", sensitivity = -0.5 })
 
 local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 
--- TRIAL: split-monitor-workspaces gives each monitor its own independent set
--- of numbered workspaces (dwm-tags-style), instead of Hyprland's default
--- global workspace numbering shared across all monitors. Cloned manually into
--- ~/.config/hypr/plugins/ for now, not yet a proper dotfiles submodule -
--- revisit packaging once we've confirmed we actually want to keep this.
+-- split-monitor-workspaces gives each monitor its own independent set of
+-- numbered workspaces (dwm-tags-style) instead of Hyprland's global numbering.
+-- Git submodule at hyprland/.config/hypr/plugins/split-monitor-workspaces.
 package.path = package.path .. ";" .. HOME .. "/.config/hypr/plugins/split-monitor-workspaces/lua/?.lua"
-local smw = require("split-monitor-workspaces")
-smw.setup({
-    workspace_count = 9,
-    -- DP-2/DP-3 are current runtime names, not EDID-stable - fine for a trial,
-    -- but should switch to desc:-based matching if we keep this for real.
-    monitor_priority = { "DP-2", "DP-3" },
-    -- The library's own default is true (all 9 tags always shown per monitor,
-    -- dwm-tag-bar style). We want the old Hyprland behavior back instead:
-    -- only show workspaces that actually exist/have windows.
-    enable_persistent_workspaces = false,
-})
+local smw_ok, smw = pcall(require, "split-monitor-workspaces")
+if smw_ok then
+    smw.setup({
+        workspace_count = 9,
+        -- Matched by EDID description prefix, so workspace ranges (and the
+        -- waybar 10-18 map) survive port renumbering. First = ids 1-9, second = 10-18.
+        -- Monitors not listed get the next free range in the order Hyprland reports them.
+        monitor_priority = {
+            "desc:Samsung Electric Company Odyssey G81SF",
+            "desc:Lenovo Group Limited LEN T24i-20",
+        },
+        -- The library's own default is true (all 9 tags always shown per monitor,
+        -- dwm-tag-bar style). We want the old Hyprland behavior back instead:
+        -- only show workspaces that actually exist/have windows.
+        enable_persistent_workspaces = false,
+    })
+else
+    -- Submodule not checked out: fall back to plain global workspaces so the
+    -- rest of the config (and every bind below) still loads.
+    hl.notification.create({ text = "split-monitor-workspaces missing: git submodule update --init", duration = 10000, icon = "warning" })
+end
 
 -- Swallow F24 emitted by kanata's home row mod workaround so it never reaches apps.
 -- Home row mods are: lsft/rsft, lalt/ralt, lmet/rmet, lctl/rctl — cover all 16
@@ -284,18 +285,26 @@ hl.bind(mainMod .. " + TAB", hl.dsp.focus({ workspace = "previous" }))
 -- Switch to the Nth workspace ON THE CURRENTLY FOCUSED MONITOR (dwm-tags-style,
 -- via split-monitor-workspaces) with mainMod + [0-9].
 -- Move active window to the Nth workspace on its monitor with mainMod + SHIFT + [0-9].
-for i = 1, smw.get_amount_of_workspaces() do
-    local key = tostring(i % 10) -- 10 maps to key 0
-    hl.bind(mainMod .. " + " .. key,         smw.workspace(key))
-    hl.bind(mainMod .. " + SHIFT + " .. key, smw.move_to_workspace_silent(key))
+if smw_ok then
+    for i = 1, smw.get_amount_of_workspaces() do
+        local key = tostring(i % 10) -- 10 maps to key 0
+        hl.bind(mainMod .. " + " .. key,         smw.workspace(key))
+        hl.bind(mainMod .. " + SHIFT + " .. key, smw.move_to_workspace_silent(key))
+    end
+else
+    for i = 1, 10 do
+        local key = i % 10
+        hl.bind(mainMod .. " + " .. key,         hl.dsp.focus({ workspace = i }))
+        hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
+    end
 end
 
--- Cycle focus between monitors, dwm-style (comma = next, period = previous).
+-- Cycle focus between monitors, dwm-style (comma = previous, period = next).
 -- (Verified live: hyprctl dispatch takes a Lua expression under the Lua config
 -- provider, not classic "dispatcher, args" syntax - hl.dsp.focus({monitor=...})
 -- is the real native call, not a shell-out to `hyprctl dispatch focusmonitor`.)
-hl.bind(mainMod .. " + comma",  hl.dsp.focus({ monitor = "+1" }))
-hl.bind(mainMod .. " + period", hl.dsp.focus({ monitor = "-1" }))
+hl.bind(mainMod .. " + comma",  hl.dsp.focus({ monitor = "-1" }))
+hl.bind(mainMod .. " + period", hl.dsp.focus({ monitor = "+1" }))
 
 -- Move the active window to the next/previous monitor, following it there.
 -- The plugin has no monitor-move call (it's workspace-based, not monitor-based),
@@ -321,8 +330,8 @@ local function move_window_to_monitor(offset)
     end
 end
 
-hl.bind(mainMod .. " + SHIFT + comma",  move_window_to_monitor(1))
-hl.bind(mainMod .. " + SHIFT + period", move_window_to_monitor(-1))
+hl.bind(mainMod .. " + SHIFT + comma",  move_window_to_monitor(-1))
+hl.bind(mainMod .. " + SHIFT + period", move_window_to_monitor(1))
 
 -- Special workspace (scratchpad)
 hl.bind(mainMod .. " + S",         hl.dsp.workspace.toggle_special("magic"))
@@ -341,8 +350,6 @@ hl.bind("XF86AudioRaiseVolume",  hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT
 hl.bind("XF86AudioLowerVolume",  hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),      { locked = true, repeating = true })
 hl.bind("XF86AudioMute",         hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),     { locked = true, repeating = true })
 hl.bind("XF86AudioMicMute",      hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),   { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessUp",   hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"),                  { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"),                  { locked = true, repeating = true })
 
 -- Requires playerctl
 hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("playerctl next"),       { locked = true })

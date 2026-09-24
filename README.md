@@ -172,10 +172,11 @@ make update                                # Update git submodules and nvim plug
 
 ## Git Submodules
 
-Zsh plugins are managed as git submodules:
+Zsh and Hyprland plugins are managed as git submodules:
 
 - [fzf-tab](https://github.com/Aloxaf/fzf-tab) - FZF-powered tab completion
 - [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting) - Shell syntax highlighting
+- [split-monitor-workspaces](https://github.com/zjeffer/split-monitor-workspaces) - Per-monitor (dwm-style) workspaces for Hyprland's Lua config
 
 To update submodules:
 ```bash
