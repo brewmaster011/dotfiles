@@ -22,9 +22,9 @@
       "8": "8",
       "9": "9",
       // split-monitor-workspaces gives each monitor a real, distinct ID range
-      // (not just a label) - monitor_priority in hyprland.lua puts DP-2 first
-      // (ids 1-9) and DP-3 second (ids 10-18). If workspace_count or
-      // monitor_priority ever changes there, this map needs updating too.
+      // (not just a label): with workspace_count = 9 (hypr/modules/split-workspaces.lua),
+      // the first monitor in cosmo's monitor_priority (hypr/host.lua) gets ids 1-9,
+      // the second 10-18. If either changes, this map needs updating too.
       "10": "1",
       "11": "2",
       "12": "3",
