@@ -21,6 +21,7 @@ package). Modules in `modules/` are enabled per host with `require("modules.<nam
 
 | Module             | What it does                                                        |
 |--------------------|---------------------------------------------------------------------|
+| `monitors`         | Screen catalog + named desk layouts (matched by EDID) and the fallback rule; optional built-in panel that turns off while docked |
 | `laptop`           | Touchpad, 3-finger workspace swipe, backlight keys                  |
 | `nvidia`           | NVIDIA Wayland env vars                                             |
 | `kanata`           | Swallows kanata's F24 home-row-mod marker key                       |
