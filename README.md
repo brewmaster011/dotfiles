@@ -24,8 +24,8 @@ stow common linux hyprland -t ~
 | `linux` | Linux | Dunst, Kanata, Ranger, Neofetch, Runit services, Scripts |
 | `hyprland` | Linux | Hyprland, Waybar, Wofi, Hyprlock, Hypridle, Hyprpaper |
 | `dwm` | Linux | Picom, Xmodmap, .xinitrc |
-| `framework` | Linux | Framework 13 laptop: Hyprland host.lua (eDP-1, touchpad, brightness keys), waybar battery modules, ICC profile, EasyEffects preset |
-| `cosmo` | Linux | Desktop: Hyprland host.lua (Odyssey G81SF, NVIDIA env), waybar modules |
+| `framework` | Linux | Framework 13 laptop: Hyprland host.lua (eDP-1; laptop + kanata modules), waybar battery modules, ICC profile, EasyEffects preset |
+| `cosmo` | Linux | Desktop: Hyprland host.lua (Odyssey G81SF + Lenovo; nvidia + split-workspaces modules), waybar modules |
 | `macos` | macOS | AeroSpace, Alacritty, Kanata, btop, posting, Zsh, git ignore, shell profile |
 | `scripts` | N/A | Bootstrap script, Makefile, package lists (not stowed) |
 
@@ -74,6 +74,10 @@ dotfiles/
 ├── hyprland/               # Hyprland (Wayland)
 │   ├── .config/
 │   │   ├── hypr/           # Hyprland, hyprlock, hypridle, hyprpaper
+│   │   │   ├── hyprland.lua    # Entry point: core, then host.lua
+│   │   │   ├── core/           # Shared config (env, autostart, look, input, binds, rules)
+│   │   │   ├── modules/        # Opt-in features a host enables (laptop, nvidia, kanata, split-workspaces)
+│   │   │   └── plugins/        # Lua plugins as git submodules
 │   │   ├── waybar/         # Status bar
 │   │   ├── wofi/           # App launcher
 │   │   └── feh/            # Wallpaper (fallback)
@@ -87,14 +91,14 @@ dotfiles/
 │
 ├── framework/              # Framework laptop (host package)
 │   └── .config/
-│       ├── hypr/host.lua       # Monitors, touchpad, brightness keys
+│       ├── hypr/host.lua       # Monitors; enables laptop + kanata modules
 │       ├── waybar/host.jsonc   # modules-right incl. battery/backlight
 │       ├── color-calibration/  # ICC profile
 │       └── easyeffects/        # Audio preset
 │
 ├── cosmo/                  # Desktop (host package)
 │   └── .config/
-│       ├── hypr/host.lua       # Monitor, NVIDIA env vars
+│       ├── hypr/host.lua       # Monitors; enables nvidia + split-workspaces modules
 │       └── waybar/host.jsonc   # modules-right
 │
 ├── macos/                  # macOS
@@ -149,8 +153,12 @@ dotfiles/
 
 ## Per-host config
 
-`hyprland/.config/hypr/hyprland.lua` holds everything shared and ends by loading
-`~/.config/hypr/host.lua` if present. Waybar's `config.jsonc` includes
+`hyprland/.config/hypr/hyprland.lua` loads `core/` (shared by every machine) and
+then `~/.config/hypr/host.lua` if present. A host file sets its monitors and
+enables the features it needs from `modules/`, e.g.
+`require("modules.laptop").setup()`. Hyprland puts `~/.config/hypr/?.lua` and
+`~/.config/hypr/?/init.lua` on the Lua module path, so no `package.path` setup is
+needed. Waybar's `config.jsonc` includes
 `~/.config/waybar/host.jsonc`, which supplies `modules-right`. Each machine
 stows exactly one host package (`framework`, `cosmo`) that provides those two files.
 To add a machine, create `<host>/.config/hypr/host.lua` and

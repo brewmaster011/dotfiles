@@ -1,4 +1,4 @@
--- cosmo desktop (Ryzen 9 9900X, RTX 5080 on nvidia-open): loaded by hyprland.lua via dofile.
+-- cosmo desktop (Ryzen 9 9900X, RTX 5080 on nvidia-open). Loaded by hyprland.lua.
 
 -- Lenovo (portrait, transform 3) on the left; Samsung to its right, starting
 -- at x=1080 - the Lenovo's logical width once rotated (1920x1080 native,
@@ -8,7 +8,10 @@ hl.monitor({ output = "desc:Lenovo Group Limited LEN T24i-20 VNA5MNX8", mode = "
 -- Fallback for unknown monitors
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1 })
 
--- NVIDIA on Wayland, per https://wiki.hypr.land/Nvidia/
-hl.env("LIBVA_DRIVER_NAME", "nvidia")
-hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
-hl.env("NVD_BACKEND", "direct")
+require("modules.nvidia").setup()
+require("modules.split-workspaces").setup({
+    monitor_priority = {
+        "desc:Samsung Electric Company Odyssey G81SF", -- workspaces 1-9
+        "desc:Lenovo Group Limited LEN T24i-20",       -- workspaces 10-18
+    },
+})

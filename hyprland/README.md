@@ -14,6 +14,18 @@ Wayland compositor setup using Hyprland with supporting tools.
 | wofi        | Application launcher        |
 | dunst       | Notifications               |
 
+## Layout
+
+`hyprland.lua` loads `core/` and then the machine's `host.lua` (from a host stow
+package). Modules in `modules/` are enabled per host with `require("modules.<name>").setup(opts)`:
+
+| Module             | What it does                                                        |
+|--------------------|---------------------------------------------------------------------|
+| `laptop`           | Touchpad, 3-finger workspace swipe, backlight keys                  |
+| `nvidia`           | NVIDIA Wayland env vars                                             |
+| `kanata`           | Swallows kanata's F24 home-row-mod marker key                       |
+| `split-workspaces` | Per-monitor workspaces via the `plugins/split-monitor-workspaces` submodule; replaces the global `Super + 0-9` binds |
+
 ## Autostart
 
 These services start automatically with Hyprland:
@@ -29,11 +41,13 @@ These services start automatically with Hyprland:
 
 ## Default Applications
 
-| Variable       | Application |
-|----------------|-------------|
-| `$terminal`    | alacritty   |
-| `$fileManager` | nautilus    |
-| `$menu`        | wofi        |
+Set at the top of `core/binds.lua`:
+
+| Variable      | Application |
+|---------------|-------------|
+| `terminal`    | alacritty   |
+| `fileManager` | nautilus    |
+| `menu`        | wofi        |
 
 ## Keybindings
 
@@ -67,8 +81,10 @@ Main modifier: `Super` (Windows key)
 
 | Binding              | Action                        |
 |----------------------|-------------------------------|
-| `Super + 1-9,0`      | Switch to workspace 1-10      |
-| `Super + Shift + 1-9,0` | Move window to workspace 1-10 |
+| `Super + 1-9,0`      | Switch to workspace 1-10 (with `split-workspaces`: 1-9 on the focused monitor) |
+| `Super + Shift + 1-9,0` | Move window to workspace 1-10 (with `split-workspaces`: silently, on the same monitor) |
+| `Super + Comma` / `Period` | Focus previous / next monitor |
+| `Super + Shift + Comma` / `Period` | Move window to previous / next monitor |
 | `Super + Tab`        | Switch to previous workspace  |
 | `Super + Scroll`     | Cycle through workspaces      |
 
@@ -112,8 +128,8 @@ Main modifier: `Super` (Windows key)
 | `XF86AudioLowerVolume` | Volume down (5%)    |
 | `XF86AudioMute`      | Toggle mute           |
 | `XF86AudioMicMute`   | Toggle mic mute       |
-| `XF86MonBrightnessUp` | Brightness up (5%)   |
-| `XF86MonBrightnessDown` | Brightness down (5%)|
+| `XF86MonBrightnessUp` | Brightness up (5%, `laptop` module)   |
+| `XF86MonBrightnessDown` | Brightness down (5%, `laptop` module)|
 | `XF86AudioPlay/Pause`| Play/pause (playerctl)|
 | `XF86AudioNext`      | Next track            |
 | `XF86AudioPrev`      | Previous track        |
@@ -141,7 +157,7 @@ Click actions:
 
 ## Environment Variables
 
-Notable variables set in hyprland.lua:
+Notable variables set in `core/env.lua`:
 
 - `SSH_AUTH_SOCK` - SSH agent socket
 - `SSH_ASKPASS` - wofi-based askpass script for GUI prompts
