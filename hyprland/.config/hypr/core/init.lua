@@ -1,0 +1,6 @@
+require("core.env")
+require("core.autostart")
+require("core.look")
+require("core.input")
+require("core.binds")
+require("core.rules")
