@@ -21,6 +21,19 @@
       "7": "7",
       "8": "8",
       "9": "9",
+      // split-monitor-workspaces gives each monitor a real, distinct ID range
+      // (not just a label) - monitor_priority in hyprland.lua puts DP-2 first
+      // (ids 1-9) and DP-3 second (ids 10-18). If workspace_count or
+      // monitor_priority ever changes there, this map needs updating too.
+      "10": "1",
+      "11": "2",
+      "12": "3",
+      "13": "4",
+      "14": "5",
+      "15": "6",
+      "16": "7",
+      "17": "8",
+      "18": "9",
     },
   },
   "hyprland/window": {

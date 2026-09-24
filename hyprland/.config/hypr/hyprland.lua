@@ -153,12 +153,14 @@ hl.animation({ leaf = "workspacesIn",  enabled = true, speed = 1.21, bezier = "a
 hl.animation({ leaf = "workspacesOut", enabled = true, speed = 1.94, bezier = "almostLinear", style = "fade" })
 hl.animation({ leaf = "zoomFactor",    enabled = true, speed = 7,    bezier = "quick" })
 
--- Ref https://wiki.hypr.land/Configuring/Workspace-Rules/
--- "Smart gaps" / "No gaps when only"
-hl.workspace_rule({ workspace = "w[tv1]", gaps_out = 0, gaps_in = 0 })
-hl.workspace_rule({ workspace = "f[1]",   gaps_out = 0, gaps_in = 0 })
-hl.window_rule({ name = "no-gaps-wtv1", match = { float = false, workspace = "w[tv1]" }, border_size = 0, rounding = 0 })
-hl.window_rule({ name = "no-gaps-f1",   match = { float = false, workspace = "f[1]" },   border_size = 0, rounding = 0 })
+-- Ref https://wiki.hypr.land/Configuring/Workspace-Rules/ and
+-- https://wiki.hypr.land/Configuring/Code-Snippets/#smart-gaps
+-- "Smart gaps" / "No gaps when only" - the s[false] selector excludes special
+-- workspaces (our scratchpad) so a lone scratchpad window keeps its border/gaps.
+hl.workspace_rule({ workspace = "w[tv1]s[false]", gaps_out = 0, gaps_in = 0 })
+hl.workspace_rule({ workspace = "f[1]s[false]",   gaps_out = 0, gaps_in = 0 })
+hl.window_rule({ name = "no-gaps-wtv1", match = { float = false, workspace = "w[tv1]s[false]" }, border_size = 0, rounding = 0 })
+hl.window_rule({ name = "no-gaps-f1",   match = { float = false, workspace = "f[1]s[false]" },   border_size = 0, rounding = 0 })
 
 -- Applies when switching to dwindle via mainMod+CTRL+SHIFT+SPACE
 -- (pseudotile option was removed in Hyprland 0.55; the pseudo dispatcher remains)
@@ -194,8 +196,15 @@ hl.config({
         follow_mouse = 1,
 
         sensitivity = 0, -- -1.0 - 1.0, 0 means no modification.
+
+        touchpad = {
+            natural_scroll = false,
+        },
     },
 })
+
+-- See https://wiki.hypr.land/Configuring/Gestures
+hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
 
 -- Example per-device config
 -- See https://wiki.hypr.land/Configuring/Keywords/#per-device-input-configs for more
@@ -207,6 +216,24 @@ hl.device({ name = "epic-mouse-v1", sensitivity = -0.5 })
 -------------------
 
 local mainMod = "SUPER" -- Sets "Windows" key as main modifier
+
+-- TRIAL: split-monitor-workspaces gives each monitor its own independent set
+-- of numbered workspaces (dwm-tags-style), instead of Hyprland's default
+-- global workspace numbering shared across all monitors. Cloned manually into
+-- ~/.config/hypr/plugins/ for now, not yet a proper dotfiles submodule -
+-- revisit packaging once we've confirmed we actually want to keep this.
+package.path = package.path .. ";" .. HOME .. "/.config/hypr/plugins/split-monitor-workspaces/lua/?.lua"
+local smw = require("split-monitor-workspaces")
+smw.setup({
+    workspace_count = 9,
+    -- DP-2/DP-3 are current runtime names, not EDID-stable - fine for a trial,
+    -- but should switch to desc:-based matching if we keep this for real.
+    monitor_priority = { "DP-2", "DP-3" },
+    -- The library's own default is true (all 9 tags always shown per monitor,
+    -- dwm-tag-bar style). We want the old Hyprland behavior back instead:
+    -- only show workspaces that actually exist/have windows.
+    enable_persistent_workspaces = false,
+})
 
 -- Swallow F24 emitted by kanata's home row mod workaround so it never reaches apps.
 -- Home row mods are: lsft/rsft, lalt/ralt, lmet/rmet, lctl/rctl — cover all 16
@@ -254,13 +281,48 @@ hl.bind(mainMod .. " + j", hl.dsp.focus({ direction = "d" }))
 -- Switch to most recent workspace
 hl.bind(mainMod .. " + TAB", hl.dsp.focus({ workspace = "previous" }))
 
--- Switch workspaces with mainMod + [0-9]
--- Move active window to a workspace with mainMod + SHIFT + [0-9]
-for i = 1, 10 do
-    local key = i % 10 -- 10 maps to key 0
-    hl.bind(mainMod .. " + " .. key,         hl.dsp.focus({ workspace = i }))
-    hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
+-- Switch to the Nth workspace ON THE CURRENTLY FOCUSED MONITOR (dwm-tags-style,
+-- via split-monitor-workspaces) with mainMod + [0-9].
+-- Move active window to the Nth workspace on its monitor with mainMod + SHIFT + [0-9].
+for i = 1, smw.get_amount_of_workspaces() do
+    local key = tostring(i % 10) -- 10 maps to key 0
+    hl.bind(mainMod .. " + " .. key,         smw.workspace(key))
+    hl.bind(mainMod .. " + SHIFT + " .. key, smw.move_to_workspace_silent(key))
 end
+
+-- Cycle focus between monitors, dwm-style (comma = next, period = previous).
+-- (Verified live: hyprctl dispatch takes a Lua expression under the Lua config
+-- provider, not classic "dispatcher, args" syntax - hl.dsp.focus({monitor=...})
+-- is the real native call, not a shell-out to `hyprctl dispatch focusmonitor`.)
+hl.bind(mainMod .. " + comma",  hl.dsp.focus({ monitor = "+1" }))
+hl.bind(mainMod .. " + period", hl.dsp.focus({ monitor = "-1" }))
+
+-- Move the active window to the next/previous monitor, following it there.
+-- The plugin has no monitor-move call (it's workspace-based, not monitor-based),
+-- so this lands the window on whatever workspace is currently active on the
+-- target monitor - the same place a mouse drag between monitors would put it.
+local function move_window_to_monitor(offset)
+    return function()
+        local cur_mon = hl.get_active_monitor()
+        if not cur_mon then return end
+
+        local mons = hl.get_monitors()
+        local idx
+        for i, m in ipairs(mons) do
+            if m.id == cur_mon.id then idx = i break end
+        end
+        if not idx then return end
+
+        local target = mons[((idx - 1 + offset) % #mons) + 1]
+        local target_ws = target.active_workspace
+        if not target_ws then return end
+
+        hl.dispatch(hl.dsp.window.move({ workspace = target_ws.name, follow = true }))
+    end
+end
+
+hl.bind(mainMod .. " + SHIFT + comma",  move_window_to_monitor(1))
+hl.bind(mainMod .. " + SHIFT + period", move_window_to_monitor(-1))
 
 -- Special workspace (scratchpad)
 hl.bind(mainMod .. " + S",         hl.dsp.workspace.toggle_special("magic"))
@@ -279,6 +341,8 @@ hl.bind("XF86AudioRaiseVolume",  hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT
 hl.bind("XF86AudioLowerVolume",  hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),      { locked = true, repeating = true })
 hl.bind("XF86AudioMute",         hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),     { locked = true, repeating = true })
 hl.bind("XF86AudioMicMute",      hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),   { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessUp",   hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"),                  { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"),                  { locked = true, repeating = true })
 
 -- Requires playerctl
 hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("playerctl next"),       { locked = true })
@@ -343,6 +407,27 @@ hl.window_rule({
 --     match = { class = "^$", title = "^$", xwayland = true, float = true, fullscreen = false, pin = false },
 --     no_focus = true,
 -- })
+
+-- Steam: keep the main client window tiled, but float all secondary popups
+-- (Friends List, chat windows, Settings, etc). Steam's chat windows just use
+-- the friend's name as the title, so there's no title pattern that reliably
+-- catches "any popup" - instead float the whole class, then re-tile only the
+-- exact main-window title. (Verified live via hyprctl: rule ordering lets a
+-- later, more specific match override an earlier broader one.)
+hl.window_rule({ name = "steam-float-popups", match = { class = "^(steam)$" }, float = true })
+hl.window_rule({ name = "steam-tile-main",    match = { class = "^(steam)$", title = "^(Steam)$" }, float = false })
+
+-- pavucontrol wasn't built with tiling in mind - way too much dead space.
+-- persistent_size remembers whatever size you last resized it to (per
+-- Hyprland session) and reopens it at that size instead of its small default.
+hl.window_rule({ name = "pavucontrol-float", match = { class = "^(org\\.pulseaudio\\.pavucontrol)$" }, float = true })
+hl.window_rule({ name = "pavucontrol-persist-size", match = { class = "^(org\\.pulseaudio\\.pavucontrol)$" }, persistent_size = true })
+
+-- Chromium notification/utility popups (e.g. web push notifications rendered
+-- as their own toplevel) ship with no app_id/title set at all - class and
+-- title both come through blank. That's the only signal Hyprland gets for
+-- them, so match on blank class + blank title.
+hl.window_rule({ name = "blank-popup-float", match = { class = "^$", title = "^$" }, float = true })
 
 
 ------------------------
