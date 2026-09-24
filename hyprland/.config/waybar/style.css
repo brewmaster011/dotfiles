@@ -39,11 +39,13 @@
 /* All other modules - consistent spacing */
 #tray,
 #cpu,
+#memory,
+#temperature,
 #backlight,
 #pulseaudio,
 #network,
 #battery,
-#power-profiles-daemon
+#power-profiles-daemon,
 #bluetooth {
   min-width: 12px;
   margin: 0px 12px;
@@ -67,4 +69,18 @@ tooltip {
 
 #power-profiles-daemon.performance {
   color: red
+}
+
+#memory.warning {
+  color: yellow;
+}
+
+#memory.critical,
+#temperature.critical {
+  color: red;
+}
+
+/* the volume glyphs render wider than their advance, eating into the gap */
+#pulseaudio {
+  margin-right: 18px;
 }
