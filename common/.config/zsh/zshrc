@@ -174,7 +174,7 @@ bindkey '^g' fzf_cd
 
 # ~/.local/bin: pipx/uv user installs (both Linux and macOS)
 export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$HOME/.cache/dotnet:$HOME/.cache/dotnet/tools:$PATH"
-export DOTNET_ROOT="$HOME.cache/dotnet"
+export DOTNET_ROOT="$HOME/.cache/dotnet"
 export FZF_DEFAULT_OPTS='--height 30% --layout=reverse --border'
 export ZSH_COMPDUMP="$HOME/.cache/zsh/zcompdump"
 
