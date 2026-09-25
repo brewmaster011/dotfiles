@@ -6,8 +6,18 @@
 local M = {}
 
 M.screens = {
-    samsung = { desc = "Samsung Electric Company Odyssey G81SF HNBYA00203", mode = "3840x2160@240", scale = 1.25, vrr = 1 },
-    lenovo  = { desc = "Lenovo Group Limited LEN T24i-20 VNA5MNX8", mode = "preferred", scale = 1 },
+    samsung = {
+        desc = "Samsung Electric Company Odyssey G81SF HNBYA00203",
+        mode = "3840x2160@240",
+        scale = 1.25,
+        vrr = 1,
+        bitdepth = 10
+    },
+    lenovo  = {
+        desc = "Lenovo Group Limited LEN T24i-20 VNA5MNX8",
+        mode = "preferred",
+        scale = 1
+    },
 }
 
 M.layouts = {
@@ -15,12 +25,11 @@ M.layouts = {
     -- at x=1080 - the Lenovo's logical width once rotated (1920x1080 native,
     -- scale 1, transform swaps it to 1080 wide x 1920 tall in layout coordinates).
     desk = {
-        { "lenovo",  position = "0x0", transform = 3 },
+        { "lenovo",  position = "0x0",   transform = 3 },
         { "samsung", position = "1080x0" },
     },
 }
 
--- "desc:<EDID description>" for a screen, e.g. for split-workspaces' monitor_priority.
 function M.desc(name)
     return "desc:" .. M.screens[name].desc
 end
@@ -50,6 +59,7 @@ function M.setup(opts)
             vrr       = screen.vrr,
             position  = entry.position,
             transform = entry.transform,
+            bitdepth  = screen.bitdepth,
         })
     end
 
