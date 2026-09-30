@@ -20,6 +20,7 @@ Wayland compositor setup using Hyprland with supporting tools.
 package). `core/tile.lua` is the default layout: dwm's `tile` as a Lua layout
 (`lua:tile`), with nmaster/mfact per workspace. `core/layouts.lua` switches each
 workspace between tile, float and monocle like dwm's pertag `setlayout`.
+Swallowing (Alacritty) also comes from the dwm config.
 Modules in `modules/` are enabled per host with `require("modules.<name>").setup(opts)`:
 
 | Module             | What it does                                                        |

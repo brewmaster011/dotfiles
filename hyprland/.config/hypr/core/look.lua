@@ -55,6 +55,11 @@ hl.config({
         font_family             = "Inconsolata Nerd Font",
         force_default_wallpaper = 0,    -- Set to 0 or 1 to disable the anime mascot wallpapers
         disable_hyprland_logo   = true, -- If true disables the random hyprland logo / anime girl background. :(
+
+        -- dwm swallow patch: Alacritty hides behind the GUI apps it launches
+        enable_swallow          = true,
+        swallow_regex           = "^(Alacritty)$",
+        swallow_exception_regex = "^(wev)$",
     },
 })
 
