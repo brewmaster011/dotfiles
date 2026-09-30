@@ -10,6 +10,7 @@ Wayland compositor setup using Hyprland with supporting tools.
 | hyprpaper   | Wallpaper daemon            |
 | hyprlock    | Lock screen                 |
 | hypridle    | Idle management             |
+| hyprsunset  | Blue-light filter + screen blanking |
 | waybar      | Status bar                  |
 | wofi        | Application launcher        |
 | dunst       | Notifications               |
@@ -40,6 +41,7 @@ These services start automatically with Hyprland:
 - `waybar` - Status bar
 - `hyprpaper` - Wallpaper
 - `hypridle` - Idle manager
+- `hyprsunset` - Blue-light filter (neutral by default) and hypridle's screen blanking
 - `hyprpolkitagent` - Polkit authentication
 - `runsvdir` - User runit services (see `linux/` package)
 - SSH agent with key loading
@@ -146,13 +148,16 @@ Main modifier: `Super` (Windows key)
 
 ## Idle Behavior (hypridle)
 
-| Timeout | Action          |
-|---------|-----------------|
-| 7 min   | Lock screen     |
-| 8 min   | Turn off display|
-| 10 min  | Suspend system  |
+| Timeout | Action                         |
+|---------|--------------------------------|
+| 1 min   | Blank screens                  |
+| 10 min  | Lock and suspend system        |
 
-Screen automatically turns back on when resuming from sleep or on user activity.
+Blanking sets hyprsunset's gamma to 0 instead of turning the displays off with
+DPMS: black is as good as off for the OLED, and the DisplayPort link stays up,
+avoiding the NVIDIA DSC link-training failure on wake. Any input un-blanks.
+The session only locks when it suspends.
+`Super + Shift + I` toggles the relaxed profile (blank 1m, lock and suspend 60m).
 
 ## Waybar Modules
 
@@ -178,7 +183,7 @@ Notable variables set in `core/env.lua`:
 
 ## Requirements
 
-- hyprland, hyprpaper, hyprlock, hypridle
+- hyprland, hyprpaper, hyprlock, hypridle, hyprsunset
 - waybar, wofi, dunst
 - pipewire (audio)
 - grim (screenshots)

@@ -128,7 +128,7 @@ hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("playerctl previous"),   { locked = tr
 -- Lock and sleep
 hl.bind(mainMod .. " + SHIFT + L",        hl.dsp.exec_cmd("hyprlock"))
 hl.bind(mainMod .. " + SHIFT + CTRL + S", hl.dsp.exec_cmd("loginctl suspend"))
--- Toggle hypridle default/relaxed profile (screen off 20m, lock 45m, suspend 60m)
+-- Toggle hypridle default/relaxed profile (blank 1m, suspend + lock 10m / 60m)
 hl.bind(mainMod .. " + SHIFT + I", hl.dsp.exec_cmd(HOME .. "/.config/scripts/idle-toggle"))
 
 -- Application launch

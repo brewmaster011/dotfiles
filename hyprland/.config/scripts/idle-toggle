@@ -8,9 +8,9 @@ RELAXED="$HOME/.config/hypr/hypridle-relaxed.conf"
 if pgrep -x hypridle -a | grep -q relaxed; then
     pkill -x hypridle
     hypridle >/dev/null 2>&1 &
-    notify-send "Idle timeouts: default" "Lock 7m, screen off 8m, suspend 10m"
+    notify-send "Idle timeouts: default" "Blank 1m, suspend + lock 10m"
 else
     pkill -x hypridle
     hypridle --config "$RELAXED" >/dev/null 2>&1 &
-    notify-send "Idle timeouts: relaxed" "Screen off 20m, lock 45m, suspend 60m"
+    notify-send "Idle timeouts: relaxed" "Blank 1m, suspend + lock 60m"
 fi
