@@ -1,5 +1,6 @@
 -- See https://wiki.hypr.land/Configuring/Binds/
 local HOME = os.getenv("HOME")
+local tile = require("core.tile")
 
 local mainMod     = "SUPER"
 local terminal    = "alacritty"
@@ -13,10 +14,10 @@ hl.bind(mainMod .. " + E",                hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V",                hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + SPACE",            hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + P",                hl.dsp.window.pseudo())         -- dwindle
-hl.bind(mainMod .. " + SHIFT + J",        hl.dsp.layout("togglesplit"))   -- dwindle
+hl.bind(mainMod .. " + SHIFT + P",        hl.dsp.layout("togglesplit"))   -- dwindle
 
 -- Runtime layout switching
-hl.bind(mainMod .. " + CTRL + SPACE",         function() hl.config({ general = { layout = "master" } }) end)
+hl.bind(mainMod .. " + CTRL + SPACE",         function() hl.config({ general = { layout = "lua:tile" } }) end)
 hl.bind(mainMod .. " + CTRL + SHIFT + SPACE", function() hl.config({ general = { layout = "dwindle" } }) end)
 
 -- Move focus with mainMod + arrow keys
@@ -25,11 +26,17 @@ hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "r" }))
 hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "u" }))
 hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "d" }))
 
--- Move focus with mainMod + vim keys
-hl.bind(mainMod .. " + h", hl.dsp.focus({ direction = "l" }))
-hl.bind(mainMod .. " + l", hl.dsp.focus({ direction = "r" }))
-hl.bind(mainMod .. " + k", hl.dsp.focus({ direction = "u" }))
-hl.bind(mainMod .. " + j", hl.dsp.focus({ direction = "d" }))
+-- dwm tile layout (core/tile.lua): J/K walk the stack, H/L size the master
+-- area, I/D add/remove masters, Shift + Return zooms to master.
+hl.bind(mainMod .. " + j",              tile.focusstack(1))
+hl.bind(mainMod .. " + k",              tile.focusstack(-1))
+hl.bind(mainMod .. " + SHIFT + j",      hl.dsp.layout("movestack +1"))
+hl.bind(mainMod .. " + SHIFT + k",      hl.dsp.layout("movestack -1"))
+hl.bind(mainMod .. " + h",              hl.dsp.layout("mfact -0.05"), { repeating = true })
+hl.bind(mainMod .. " + l",              hl.dsp.layout("mfact +0.05"), { repeating = true })
+hl.bind(mainMod .. " + i",              hl.dsp.layout("incnmaster +1"))
+hl.bind(mainMod .. " + d",              hl.dsp.layout("incnmaster -1"))
+hl.bind(mainMod .. " + SHIFT + Return", hl.dsp.layout("zoom"))
 
 -- Switch to most recent workspace
 hl.bind(mainMod .. " + TAB", hl.dsp.focus({ workspace = "previous" }))
@@ -103,7 +110,7 @@ hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("playerctl previous"),   { locked = tr
 hl.bind(mainMod .. " + SHIFT + L",        hl.dsp.exec_cmd("hyprlock"))
 hl.bind(mainMod .. " + SHIFT + CTRL + S", hl.dsp.exec_cmd("loginctl suspend"))
 -- Toggle hypridle default/relaxed profile (screen off 20m, lock 45m, suspend 60m)
-hl.bind(mainMod .. " + I", hl.dsp.exec_cmd(HOME .. "/.config/scripts/idle-toggle"))
+hl.bind(mainMod .. " + SHIFT + I", hl.dsp.exec_cmd(HOME .. "/.config/scripts/idle-toggle"))
 
 -- Application launch
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("chromium"))

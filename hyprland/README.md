@@ -17,7 +17,9 @@ Wayland compositor setup using Hyprland with supporting tools.
 ## Layout
 
 `hyprland.lua` loads `core/` and then the machine's `host.lua` (from a host stow
-package). Modules in `modules/` are enabled per host with `require("modules.<name>").setup(opts)`:
+package). `core/tile.lua` is the default layout: dwm's `tile` as a Lua layout
+(`lua:tile`), with nmaster/mfact per workspace.
+Modules in `modules/` are enabled per host with `require("modules.<name>").setup(opts)`:
 
 | Module             | What it does                                                        |
 |--------------------|---------------------------------------------------------------------|
@@ -66,17 +68,19 @@ Main modifier: `Super` (Windows key)
 | `Super + W`          | Open Chromium             |
 | `Super + V`          | Toggle floating           |
 | `Super + P`          | Pseudo-tile (dwindle)     |
-| `Super + Shift + J`  | Toggle split (dwindle)    |
+| `Super + Shift + P`  | Toggle split (dwindle)    |
 | `Print`              | Screenshot (grim)         |
 
-### Window Focus
+### Tile Layout (dwm-style)
 
-| Binding              | Action         |
-|----------------------|----------------|
-| `Super + H` / `Left` | Focus left     |
-| `Super + L` / `Right`| Focus right    |
-| `Super + K` / `Up`   | Focus up       |
-| `Super + J` / `Down` | Focus down     |
+| Binding                  | Action                                          |
+|--------------------------|-------------------------------------------------|
+| `Super + J` / `K`        | Focus next / previous window in the stack       |
+| `Super + Shift + J` / `K`| Move window down / up the stack                 |
+| `Super + H` / `L`        | Shrink / grow the master area (mfact)           |
+| `Super + I` / `D`        | Add / remove a master (0 and up)                |
+| `Super + Shift + Return` | Zoom: swap focused window with the master       |
+| `Super + Arrows`         | Focus window in that direction                  |
 
 ### Workspaces
 
@@ -101,7 +105,7 @@ Main modifier: `Super` (Windows key)
 | Binding              | Action         |
 |----------------------|----------------|
 | `Super + LMB drag`   | Move window    |
-| `Super + RMB drag`   | Resize window  |
+| `Super + RMB drag`   | Resize window (floating only; tiled windows use `Super + H/L`) |
 
 ### MX Master 4 Mouse Buttons
 
@@ -120,6 +124,7 @@ Main modifier: `Super` (Windows key)
 | `Super + Shift + L`       | Lock screen      |
 | `Super + Shift + Ctrl + S`| Suspend          |
 | `Super + B`               | Toggle waybar    |
+| `Super + Shift + I`       | Toggle relaxed idle profile |
 
 ### Media Keys
 

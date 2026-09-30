@@ -15,7 +15,7 @@ hl.config({
 
         allow_tearing = false,
 
-        layout = "master",
+        layout = "lua:tile", -- dwm tile, see core/tile.lua
     },
 
     decoration = {
@@ -49,10 +49,6 @@ hl.config({
     -- (pseudotile option was removed in Hyprland 0.55; the pseudo dispatcher remains)
     dwindle = {
         preserve_split = true,
-    },
-
-    master = {
-        new_status = "master",
     },
 
     misc = {
