@@ -130,6 +130,8 @@ hl.bind(mainMod .. " + SHIFT + L",        hl.dsp.exec_cmd("hyprlock"))
 hl.bind(mainMod .. " + SHIFT + CTRL + S", hl.dsp.exec_cmd("loginctl suspend"))
 -- Toggle hypridle default/relaxed profile (blank 1m, suspend + lock 10m / 60m)
 hl.bind(mainMod .. " + SHIFT + I", hl.dsp.exec_cmd(HOME .. "/.config/scripts/idle-toggle"))
+-- Toggle the blue-light filter (hyprsunset); also un-sticks a blanked screen
+hl.bind(mainMod .. " + N",         hl.dsp.exec_cmd(HOME .. "/.config/scripts/sunset-toggle"))
 
 -- Application launch
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("chromium"))

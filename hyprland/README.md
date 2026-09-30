@@ -131,6 +131,7 @@ Main modifier: `Super` (Windows key)
 | `Super + Shift + Ctrl + S`| Suspend          |
 | `Super + B`               | Toggle waybar    |
 | `Super + Shift + I`       | Toggle relaxed idle profile |
+| `Super + N`               | Toggle blue-light filter (6000K); also restores a blanked screen |
 
 ### Media Keys
 
