@@ -24,7 +24,7 @@ stow common linux hyprland -t ~
 | `linux` | Linux | Dunst, Kanata, Ranger, Neofetch, Runit services, Scripts |
 | `hyprland` | Linux | Hyprland, Waybar, Wofi, Hyprlock, Hypridle, Hyprpaper |
 | `dwm` | Linux | Picom, Xmodmap, .xinitrc |
-| `framework` | Linux | Framework 13 laptop: Hyprland host.lua (desk layout + eDP-1 off when docked; laptop + kanata modules), waybar battery modules, ICC profile, EasyEffects preset |
+| `framework` | Linux | Framework 13 laptop: Hyprland host.lua (desk layout + eDP-1 off when docked; laptop, kanata + split-workspaces modules), waybar battery modules, ICC profile, EasyEffects preset |
 | `cosmo` | Linux | Desktop: Hyprland host.lua (desk layout; nvidia + split-workspaces modules), waybar modules |
 | `macos` | macOS | AeroSpace, Alacritty, Kanata, btop, posting, Zsh, git ignore, shell profile |
 | `scripts` | N/A | Bootstrap script, Makefile, package lists (not stowed) |
@@ -91,7 +91,7 @@ dotfiles/
 │
 ├── framework/              # Framework laptop (host package)
 │   └── .config/
-│       ├── hypr/host.lua       # Desk layout + built-in panel; laptop + kanata modules
+│       ├── hypr/host.lua       # Desk layout + built-in panel; laptop, kanata + split-workspaces modules
 │       ├── waybar/host.jsonc   # modules-right incl. battery/backlight
 │       ├── color-calibration/  # ICC profile
 │       └── easyeffects/        # Audio preset

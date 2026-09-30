@@ -23,8 +23,8 @@
       "9": "9",
       // split-monitor-workspaces gives each monitor a real, distinct ID range
       // (not just a label): with workspace_count = 9 (hypr/modules/split-workspaces.lua),
-      // the first monitor in cosmo's monitor_priority (hypr/host.lua) gets ids 1-9,
-      // the second 10-18. If either changes, this map needs updating too.
+      // the first monitor in the host's monitor_priority (hypr/host.lua) gets ids 1-9,
+      // the second 10-18, the third 19-27. If either changes, this map needs updating too.
       "10": "1",
       "11": "2",
       "12": "3",
@@ -34,6 +34,17 @@
       "16": "7",
       "17": "8",
       "18": "9",
+      // The plugin never forgets a configured monitor's priority, so after
+      // undocking the framework's eDP-1 (listed third) gets 19-27.
+      "19": "1",
+      "20": "2",
+      "21": "3",
+      "22": "4",
+      "23": "5",
+      "24": "6",
+      "25": "7",
+      "26": "8",
+      "27": "9",
     },
   },
   "hyprland/window": {
