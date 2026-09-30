@@ -109,6 +109,7 @@ Main modifier: `Super` (Windows key)
 |----------------------|----------------|
 | `Super + LMB drag`   | Move window    |
 | `Super + RMB drag`   | Resize window (floating only; tiled windows use `Super + H/L`) |
+| `Super + Middle click` | Toggle floating |
 
 ### MX Master 4 Mouse Buttons
 
