@@ -11,6 +11,8 @@ local defaults = {
     -- dwm-tag-bar style). We want the old Hyprland behavior instead:
     -- only show workspaces that actually exist/have windows.
     enable_persistent_workspaces = false,
+    -- dwm focusadjacenttag stops at the first/last tag instead of wrapping.
+    enable_wrapping = false,
 }
 
 -- opts are passed to smw.setup(); see plugins/split-monitor-workspaces/lua/globals.lua.
@@ -39,6 +41,15 @@ function M.setup(opts)
         hl.bind(mainMod .. " + " .. key,         smw.workspace(key))
         hl.bind(mainMod .. " + SHIFT + " .. key, smw.move_to_workspace_silent(key))
     end
+
+    -- Adjacent workspace within this monitor's range (replaces core/binds' global ones)
+    for _, k in ipairs({ "left", "right", "SHIFT + left", "SHIFT + right" }) do
+        hl.unbind(mainMod .. " + " .. k)
+    end
+    hl.bind(mainMod .. " + left",          smw.cycle_workspaces("prev"))
+    hl.bind(mainMod .. " + right",         smw.cycle_workspaces("next"))
+    hl.bind(mainMod .. " + SHIFT + left",  smw.move_to_workspace_silent("-1"))
+    hl.bind(mainMod .. " + SHIFT + right", smw.move_to_workspace_silent("+1"))
 end
 
 return M

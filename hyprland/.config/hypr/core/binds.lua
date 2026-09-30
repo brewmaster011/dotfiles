@@ -23,11 +23,26 @@ hl.bind(mainMod .. " + F",     layouts.setlayout("float"))
 hl.bind(mainMod .. " + M",     layouts.setlayout("monocle"))
 hl.bind(mainMod .. " + SPACE", layouts.setlayout())
 
--- Move focus with mainMod + arrow keys
-hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "l" }))
-hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "r" }))
-hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "u" }))
-hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "d" }))
+-- View / send the window to the adjacent workspace, no wrapping (dwm
+-- focusadjacenttag). modules/split-workspaces replaces these with per-monitor ones.
+local function adjacent_workspace(delta, move)
+    return function()
+        local ws = hl.get_active_workspace()
+        if not ws or ws.special then return end
+        local target = ws.id + delta
+        if target < 1 or target > 9 then return end
+        if move then
+            hl.dispatch(hl.dsp.window.move({ workspace = target, follow = false }))
+        else
+            hl.dispatch(hl.dsp.focus({ workspace = target }))
+        end
+    end
+end
+
+hl.bind(mainMod .. " + left",          adjacent_workspace(-1))
+hl.bind(mainMod .. " + right",         adjacent_workspace(1))
+hl.bind(mainMod .. " + SHIFT + left",  adjacent_workspace(-1, true))
+hl.bind(mainMod .. " + SHIFT + right", adjacent_workspace(1, true))
 
 -- dwm tile layout (core/tile.lua): J/K walk the stack, H/L size the master
 -- area, I/D add/remove masters, Shift + Return zooms to master.

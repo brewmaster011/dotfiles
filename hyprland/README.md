@@ -79,7 +79,6 @@ Main modifier: `Super` (Windows key)
 | `Super + H` / `L`        | Shrink / grow the master area (mfact)           |
 | `Super + I` / `D`        | Add / remove a master (0 and up)                |
 | `Super + Shift + Return` | Zoom: swap focused window with the master       |
-| `Super + Arrows`         | Focus window in that direction                  |
 | `Super + T` / `F` / `M`  | Tile / float / monocle layout (per workspace)   |
 | `Super + Space`          | Swap back to the previous layout                |
 
@@ -91,6 +90,8 @@ Main modifier: `Super` (Windows key)
 | `Super + Shift + 1-9,0` | Move window to workspace 1-10 (with `split-workspaces`: silently, on the same monitor) |
 | `Super + Comma` / `Period` | Focus previous / next monitor |
 | `Super + Shift + Comma` / `Period` | Move window to previous / next monitor |
+| `Super + Left` / `Right` | Switch to the adjacent workspace (no wrap)  |
+| `Super + Shift + Left` / `Right` | Send window to the adjacent workspace, without following |
 | `Super + Tab`        | Switch to previous workspace  |
 | `Super + Scroll`     | Cycle through workspaces      |
 
