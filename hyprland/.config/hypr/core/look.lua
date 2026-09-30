@@ -45,8 +45,8 @@ hl.config({
         enabled = true,
     },
 
-    -- Applies when switching to dwindle via mainMod+CTRL+SHIFT+SPACE
-    -- (pseudotile option was removed in Hyprland 0.55; the pseudo dispatcher remains)
+    -- Only used if a workspace is set to dwindle by hand; no bind switches to it
+    -- (the layouts are lua:tile, float and monocle, see core/layouts.lua)
     dwindle = {
         preserve_split = true,
     },
