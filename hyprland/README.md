@@ -18,7 +18,8 @@ Wayland compositor setup using Hyprland with supporting tools.
 
 `hyprland.lua` loads `core/` and then the machine's `host.lua` (from a host stow
 package). `core/tile.lua` is the default layout: dwm's `tile` as a Lua layout
-(`lua:tile`), with nmaster/mfact per workspace.
+(`lua:tile`), with nmaster/mfact per workspace. `core/layouts.lua` switches each
+workspace between tile, float and monocle like dwm's pertag `setlayout`.
 Modules in `modules/` are enabled per host with `require("modules.<name>").setup(opts)`:
 
 | Module             | What it does                                                        |
@@ -61,14 +62,12 @@ Main modifier: `Super` (Windows key)
 | Binding              | Action                    |
 |----------------------|---------------------------|
 | `Super + Return`     | Open terminal             |
-| `Super + Space`      | Open app launcher (wofi)  |
+| `Super + P`          | Open app launcher (wofi)  |
 | `Super + Shift + C`  | Close active window       |
 | `Super + Shift + Ctrl + M` | Exit Hyprland       |
 | `Super + E`          | Open file manager         |
 | `Super + W`          | Open Chromium             |
-| `Super + V`          | Toggle floating           |
-| `Super + P`          | Pseudo-tile (dwindle)     |
-| `Super + Shift + P`  | Toggle split (dwindle)    |
+| `Super + Shift + Space` / `V` | Toggle floating   |
 | `Print`              | Screenshot (grim)         |
 
 ### Tile Layout (dwm-style)
@@ -81,6 +80,8 @@ Main modifier: `Super` (Windows key)
 | `Super + I` / `D`        | Add / remove a master (0 and up)                |
 | `Super + Shift + Return` | Zoom: swap focused window with the master       |
 | `Super + Arrows`         | Focus window in that direction                  |
+| `Super + T` / `F` / `M`  | Tile / float / monocle layout (per workspace)   |
+| `Super + Space`          | Swap back to the previous layout                |
 
 ### Workspaces
 

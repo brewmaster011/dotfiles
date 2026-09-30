@@ -1,6 +1,7 @@
 -- See https://wiki.hypr.land/Configuring/Binds/
 local HOME = os.getenv("HOME")
-local tile = require("core.tile")
+local tile    = require("core.tile")
+local layouts = require("core.layouts")
 
 local mainMod     = "SUPER"
 local terminal    = "alacritty"
@@ -12,13 +13,15 @@ hl.bind(mainMod .. " + SHIFT + C",        hl.dsp.window.close())
 hl.bind(mainMod .. " + SHIFT + CTRL + M", hl.dsp.exit())
 hl.bind(mainMod .. " + E",                hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V",                hl.dsp.window.float({ action = "toggle" }))
-hl.bind(mainMod .. " + SPACE",            hl.dsp.exec_cmd(menu))
-hl.bind(mainMod .. " + P",                hl.dsp.window.pseudo())         -- dwindle
-hl.bind(mainMod .. " + SHIFT + P",        hl.dsp.layout("togglesplit"))   -- dwindle
+hl.bind(mainMod .. " + SHIFT + SPACE",    hl.dsp.window.float({ action = "toggle" }))
+hl.bind(mainMod .. " + P",                hl.dsp.exec_cmd(menu))
 
--- Runtime layout switching
-hl.bind(mainMod .. " + CTRL + SPACE",         function() hl.config({ general = { layout = "lua:tile" } }) end)
-hl.bind(mainMod .. " + CTRL + SHIFT + SPACE", function() hl.config({ general = { layout = "dwindle" } }) end)
+-- Per-workspace layouts, dwm-style (core/layouts.lua): Space swaps back to the
+-- previous one.
+hl.bind(mainMod .. " + T",     layouts.setlayout("tile"))
+hl.bind(mainMod .. " + F",     layouts.setlayout("float"))
+hl.bind(mainMod .. " + M",     layouts.setlayout("monocle"))
+hl.bind(mainMod .. " + SPACE", layouts.setlayout())
 
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "l" }))

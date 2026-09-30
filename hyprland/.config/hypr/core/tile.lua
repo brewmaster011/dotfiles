@@ -16,7 +16,7 @@
 --
 -- M.focusstack(dir) focuses the next/previous window in stack order (dwm
 -- focusstack); it's a bind function rather than a layout message because it
--- dispatches focus. Tiled windows can't be resized with the mouse (Hyprland
+-- dispatches focus, and it also covers monocle workspaces. Tiled windows can't be resized with the mouse (Hyprland
 -- hands Lua layouts no drag delta) - same as dwm, where mfact is keyboard-only.
 local M = {}
 
@@ -156,6 +156,12 @@ function M.focusstack(dir)
     return function()
         local active = hl.get_active_window()
         if not active or not active.workspace then return end
+
+        -- monocle ignores focus requests for windows behind the front one
+        if active.workspace.tiled_layout == "monocle" and not active.floating then
+            hl.dispatch(hl.dsp.layout(dir > 0 and "cyclenext" or "cycleprev"))
+            return
+        end
 
         local all, windows = {}, {}
         for _, w in ipairs(hl.get_workspace_windows(active.workspace.id) or {}) do
