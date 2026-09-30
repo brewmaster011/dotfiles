@@ -1,0 +1,19 @@
+#!/bin/sh
+# Run a command only when docked or only when undocked; used by hypridle's
+# listeners so one config covers both. Undocked means a built-in panel (eDP-*)
+# is on: hypr/modules/monitors.lua turns it off while a desk screen is
+# connected. A machine without one (cosmo) always counts as docked.
+#
+# Usage: idle-when docked|undocked <command> [args...]
+
+want=$1
+shift
+
+if hyprctl monitors | grep -q '^Monitor eDP-'; then
+    state=undocked
+else
+    state=docked
+fi
+
+[ "$state" = "$want" ] && exec "$@"
+exit 0

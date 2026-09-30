@@ -149,16 +149,21 @@ Main modifier: `Super` (Windows key)
 
 ## Idle Behavior (hypridle)
 
-| Timeout | Action                         |
-|---------|--------------------------------|
-| 1 min   | Blank screens                  |
-| 10 min  | Lock and suspend system        |
+| Timeout | Undocked laptop    | Docked / cosmo |
+|---------|--------------------|----------------|
+| 1 min   |                    | Blank screens  |
+| 7 min   | Lock               |                |
+| 8 min   | Screen off (DPMS)  |                |
+| 10 min  | Lock and suspend   | Lock and suspend |
 
-Blanking sets hyprsunset's gamma to 0 instead of turning the displays off with
-DPMS: black is as good as off for the OLED, and the DisplayPort link stays up,
-avoiding the NVIDIA DSC link-training failure on wake. Any input un-blanks.
-The session only locks when it suspends.
-`Super + Shift + I` toggles the relaxed profile (blank 1m, lock and suspend 60m).
+"Undocked" means a built-in panel (`eDP-*`) is on; `scripts/idle-when` checks
+that as each listener fires, so one config covers both. Docked, blanking sets
+hyprsunset's gamma to 0 instead of turning the displays off with DPMS: black is
+as good as off for the OLED, and the DisplayPort link stays up, avoiding the
+NVIDIA DSC link-training failure on wake. Any input un-blanks, and the session
+only locks when it suspends.
+`Super + Shift + I` toggles the relaxed profile (undocked: screen off 20m, lock
+45m; docked: blank 1m; suspend 60m).
 
 ## Waybar Modules
 
