@@ -6,6 +6,8 @@
     "pulseaudio",
     "bluetooth",
     "network",
+    "network#vpn-home",
+    "network#vpn-remote",
     "tray"
   ]
 }

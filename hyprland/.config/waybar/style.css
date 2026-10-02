@@ -5,7 +5,7 @@
   border: none;
   border-radius: 0;
   min-height: 0;
-  font-family: Inconsolata Nerd Font;
+  font-family: Inconsolata Nerd Font Propo;
   font-size: 22px;
 }
 
@@ -48,7 +48,7 @@
 #power-profiles-daemon,
 #bluetooth {
   min-width: 12px;
-  margin: 0px 12px;
+  margin: 0px 10px;
 }
 
 tooltip {
@@ -78,9 +78,4 @@ tooltip {
 #memory.critical,
 #temperature.critical {
   color: red;
-}
-
-/* the volume glyphs render wider than their advance, eating into the gap */
-#pulseaudio {
-  margin-right: 18px;
 }

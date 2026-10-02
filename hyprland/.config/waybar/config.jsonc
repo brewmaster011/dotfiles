@@ -99,6 +99,22 @@
     "spacing": 1,
     "on-click": "nm-connection-editor"
   },
+  // One per WireGuard profile; NM names the interface after the connection.
+  // Link state comes over netlink, and the empty disconnected format hides it.
+  "network#vpn-home": {
+    "interface": "Home",
+    "format": "󰣫",
+    "format-disconnected": "",
+    "tooltip-format": "VPN: {ifname}\n{ipaddr}",
+    "on-click": "nm-connection-editor"
+  },
+  "network#vpn-remote": {
+    "interface": "Remote",
+    "format": "󱇱",
+    "format-disconnected": "",
+    "tooltip-format": "VPN: {ifname}\n{ipaddr}",
+    "on-click": "nm-connection-editor"
+  },
   "battery": {
     "format": "{capacity}% {icon}",
     "format-discharging": "{capacity}% {icon}",
@@ -149,10 +165,10 @@
     "tooltip-format": "Power profile: {profile}\nDriver: {driver}",
     "tooltip": true,
     "format-icons": {
-      "default": " ",
-      "performance": " ",
-      "balanced": " ",
-      "power-saver": " "
+      "default": "",
+      "performance": "",
+      "balanced": "",
+      "power-saver": ""
     }
   }
 }
