@@ -1,0 +1,13 @@
+{
+  "modules-right": [
+    "battery",
+    "power-profiles-daemon",
+    "backlight",
+    "pulseaudio",
+    "bluetooth",
+    "network",
+    "network#vpn-home",
+    "network#vpn-remote",
+    "tray"
+  ]
+}

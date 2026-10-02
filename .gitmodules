@@ -4,3 +4,6 @@
 [submodule "common/.config/zsh/plugins/zsh-syntax-highlighting"]
 	path = common/.config/zsh/plugins/zsh-syntax-highlighting
 	url = https://github.com/zsh-users/zsh-syntax-highlighting
+[submodule "hyprland/.config/hypr/plugins/split-monitor-workspaces"]
+	path = hyprland/.config/hypr/plugins/split-monitor-workspaces
+	url = https://github.com/zjeffer/split-monitor-workspaces
