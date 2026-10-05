@@ -1,7 +1,7 @@
 # ABOUTME: Makefile for dotfiles management
-# ABOUTME: Provides stow, unstow, and update commands
+# ABOUTME: Provides stow, restow, unstow, and update commands
 
-.PHONY: install stow unstow update help
+.PHONY: install stow restow unstow update help
 
 STOW_TARGET := $(HOME)
 
@@ -11,6 +11,7 @@ help:
 	@echo "Usage:"
 	@echo "  make install                           - Run bootstrap script"
 	@echo "  make stow PACKAGES='common linux'      - Stow specified packages"
+	@echo "  make restow PACKAGES='common linux'    - Restow after a pull (also prunes links to deleted files)"
 	@echo "  make unstow PACKAGES='common linux'    - Unstow specified packages"
 	@echo "  make update                            - Update submodules and nvim plugins"
 	@echo ""
@@ -36,6 +37,13 @@ ifndef PACKAGES
 	$(error PACKAGES is required. Example: make stow PACKAGES='common linux')
 endif
 	stow $(PACKAGES) -t $(STOW_TARGET)
+
+# Unstow + stow: picks up new files and removes links to files deleted from a package
+restow:
+ifndef PACKAGES
+	$(error PACKAGES is required. Example: make restow PACKAGES='common linux')
+endif
+	stow -R $(PACKAGES) -t $(STOW_TARGET)
 
 unstow:
 ifndef PACKAGES

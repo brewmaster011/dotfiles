@@ -175,6 +175,7 @@ To add a machine, create `<host>/.config/hypr/host.lua` and
 make help                                  # Show available commands
 make install                               # Run bootstrap script
 make stow PACKAGES='common linux'          # Stow specified packages
+make restow PACKAGES='common linux'        # Restow after a pull (prunes links to deleted files)
 make unstow PACKAGES='common linux'        # Unstow specified packages
 make update                                # Update git submodules and nvim plugins
 ```
