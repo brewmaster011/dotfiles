@@ -30,6 +30,7 @@ Modules in `modules/` are enabled per host with `require("modules.<name>").setup
 | `laptop`           | Touchpad, 3-finger workspace swipe, backlight keys                  |
 | `nvidia`           | NVIDIA Wayland env vars                                             |
 | `kanata`           | Swallows kanata's F24 home-row-mod marker key                       |
+| `wluma`            | Starts wluma: automatic screen + keyboard backlight from the ambient light sensor, learned from manual changes (config in the host package) |
 | `split-workspaces` | Per-monitor workspaces via the `plugins/split-monitor-workspaces` submodule; replaces the global `Super + 0-9` binds |
 
 ## Autostart

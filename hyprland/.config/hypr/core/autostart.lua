@@ -8,7 +8,9 @@ hl.on("hyprland.start", function()
     hl.exec_cmd([[bash -c 'until [ -S "$XDG_RUNTIME_DIR/pulse/native" ]; do sleep 0.25; done; waybar']])
     hl.exec_cmd("hyprpaper")
     hl.exec_cmd("hypridle")
-    hl.exec_cmd("hyprsunset") -- blue-light toggle + hypridle's screen blanking
+    -- No config file on purpose: a profile would be re-applied daily at its time,
+    -- resetting gamma (un-blanking an idle screen); --identity starts neutral.
+    hl.exec_cmd("hyprsunset --identity") -- blue-light toggle + hypridle's screen blanking
     hl.exec_cmd("/usr/lib/hyprpolkitagent/hyprpolkitagent")
 
     -- SSH Agent setup

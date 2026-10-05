@@ -23,7 +23,7 @@ end
 -- box: where to put w once floating, or nil for Hyprland's own float placement
 local function float_window(ws_id, w, box)
     if w.floating then return end
-    hl.dispatch(hl.dsp.window.float({ action = "set", window = w }))
+    hl.dispatch(hl.dsp.window.float({ action = "on", window = w }))
     if box then
         hl.dispatch(hl.dsp.window.resize({ window = w, x = box.w, y = box.h }))
         hl.dispatch(hl.dsp.window.move({ window = w, x = box.x, y = box.y }))
@@ -50,7 +50,7 @@ local function leave_float(ws)
     floated[ws.id] = nil
     for _, w in ipairs(hl.get_workspace_windows(ws.id) or {}) do
         if ids[w.stable_id] and w.floating then
-            hl.dispatch(hl.dsp.window.float({ action = "unset", window = w }))
+            hl.dispatch(hl.dsp.window.float({ action = "off", window = w }))
         end
     end
 end
@@ -108,7 +108,7 @@ hl.on("window.move_to_workspace", function(w, ws)
         if id ~= ws.id and ids[w.stable_id] then
             ids[w.stable_id] = nil
             if not floated[ws.id] and w.floating then
-                hl.dispatch(hl.dsp.window.float({ action = "unset", window = w }))
+                hl.dispatch(hl.dsp.window.float({ action = "off", window = w }))
             end
         end
     end

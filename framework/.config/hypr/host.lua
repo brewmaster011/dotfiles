@@ -17,6 +17,7 @@ monitors.setup({
 
 require("modules.laptop").setup()
 require("modules.kanata").setup()
+require("modules.wluma").setup()
 -- Same per-monitor workspaces as cosmo when docked. eDP-1 goes last so it
 -- never shifts the desk screens' ranges while docking.
 require("modules.split-workspaces").setup({

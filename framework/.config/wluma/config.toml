@@ -1,0 +1,10 @@
+# wluma: brightness from the ambient light sensor (IIO, found automatically)
+# and screen contents. Learned data lives in ~/.local/state/wluma/.
+# Idle dimming (30% after 2 min) and the keyboard backlight stay on their
+# automatic defaults.
+
+[[output.backlight]]
+name = "eDP-1"
+# hyprsunset owns colour (blue-light filter, idle blanking); without this wluma
+# keeps retrying Wayland gamma control every 30s.
+gamma = false

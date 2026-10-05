@@ -1,5 +1,5 @@
 #!/bin/sh
-# Toggle hyprsunset's blue-light tint (off by default, see hypr/hyprsunset.conf).
+# Toggle hyprsunset's blue-light tint (off by default: started with --identity).
 # Also restores gamma, so this key brings the screens back if hypridle's
 # gamma blank ever gets stuck.
 
