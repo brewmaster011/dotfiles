@@ -4,7 +4,9 @@
 #
 # Close every pi session first: pi runs from its agent dir, so moving it under a
 # running pi breaks that session. Safe to run again; on a machine that already
-# uses ~/.config/pi/agent (macOS) it only links the tracked files.
+# uses ~/.config/pi/agent (macOS) it only links the tracked files. Stow common
+# first (or let it, below) so ~/.zshenv exports PI_CODING_AGENT_DIR: pi only
+# looks in ~/.config/pi/agent when that variable is set.
 #
 # Usage: scripts/migrate-pi.sh
 
@@ -19,7 +21,7 @@ if [ -n "${PI_CODING_AGENT:-}" ] || pgrep -u "$(id -u)" -f '^pi( |$)' >/dev/null
     exit 1
 fi
 
-if [ -L "$HOME/.config/pi" ] || [ -L "$new" ]; then
+if [ -L "$HOME/.config" ] || [ -L "$HOME/.config/pi" ] || [ -L "$new" ]; then
     echo "$HOME/.config/pi is linked into the repo (stow folded it); see" >&2
     echo "'pi coding agent' in README.md before running this." >&2
     exit 1
@@ -42,10 +44,13 @@ if [ -d "$old" ] && [ ! -L "$old" ]; then
     fi
     mkdir -p "$(dirname "$new")"
     mv "$old" "$new"
-    # A pi started without PI_CODING_AGENT_DIR (any shell opened before this)
-    # would otherwise create a fresh, empty ~/.pi/agent and use that
-    ln -s ../.config/pi/agent "$old"
-    echo "Moved $old to $new and linked $old to it"
+    echo "Moved $old to $new"
+fi
+# Earlier versions of this script left ~/.pi/agent as a link to the new dir
+if [ -L "$old" ]; then
+    rm "$old"
+    rmdir "$HOME/.pi" 2>/dev/null || true
+    echo "Removed the $old link"
 fi
 
 # 2. Point the installer's launcher link at the new location
@@ -90,6 +95,6 @@ if [ -n "$differs" ]; then
     echo "This machine's copies differed from the repo; review: git -C \"$repo\" diff"
 fi
 if [ "${PI_CODING_AGENT_DIR:-}" != "$new" ]; then
-    echo "Shells opened before the move lack PI_CODING_AGENT_DIR; pi still works"
-    echo "there through the ~/.pi/agent link, but restart them when convenient."
+    echo "PI_CODING_AGENT_DIR is not set in this shell. Only start pi from a shell"
+    echo "that has it (new ones get it from ~/.zshenv), or it recreates $old."
 fi

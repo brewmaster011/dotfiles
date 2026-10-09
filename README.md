@@ -170,14 +170,18 @@ To add a machine, create `<host>/.config/hypr/host.lua` and
 ## Shell environment
 
 - `PROJECTS_DIR` — base directory the `^g` fzf project-jump widget searches (defaults to `~/Documents/source`). Set it per-machine in the OS `zshrc.local` if your projects live elsewhere.
-- `PI_CODING_AGENT_DIR` — pi's config dir, `~/.config/pi/agent` on every machine (set in the common zshrc; see below).
+- `PI_CODING_AGENT_DIR` — pi's config dir, `~/.config/pi/agent` on every machine. Set in `common/.zshenv` (every zsh, scripts included) and in Hyprland's `core/env.lua` for GUI launches; pi falls back to `~/.pi/agent` wherever it is unset (see below).
 
 ## pi coding agent
 
 `common` carries [pi](https://pi.dev)'s config: `settings.json` (preferences and
 the pi packages it installs at startup), the `gruvbox-pastel` theme and the
 `context-footer` extension (the status bar at the bottom). It lives in
-`~/.config/pi/agent` instead of pi's default `~/.pi/agent`.
+`~/.config/pi/agent` instead of pi's default `~/.pi/agent`; nothing of pi's is
+kept in `~` itself. pi only honours `PI_CODING_AGENT_DIR` for that, so the
+variable is exported from `~/.zshenv` and the Hyprland environment. A pi started
+without it silently creates a fresh `~/.pi/agent`; if one appears, rerun
+`scripts/migrate-pi.sh` after closing pi.
 
 pi keeps its credentials (`auth.json`), sessions, its own install and caches in
 the same directory. This repo is public, so `.gitignore` ignores everything
@@ -191,12 +195,11 @@ show up as changes here.
   plain stow, `mkdir -p ~/.config/pi/agent` first. Then open a new shell and
   install pi (the installer follows `PI_CODING_AGENT_DIR`).
 - **Machine still on `~/.pi/agent`**, or macOS (already on `~/.config/pi/agent`):
-  close pi and run `scripts/migrate-pi.sh`. It moves the directory, re-points
-  `~/.local/bin/pi` and links the tracked files. Copies that differed from the
-  repo replace the repo's, so `git diff` shows them. Until then the zshrc leaves
-  `PI_CODING_AGENT_DIR` unset there, so pi keeps working on the default. The
-  script leaves `~/.pi/agent` as a link to the new dir, so a pi started from a
-  shell opened before the move still finds everything.
+  close pi and run `scripts/migrate-pi.sh` right after pulling and restowing
+  `common`. It moves the directory, re-points `~/.local/bin/pi` and links the
+  tracked files. Copies that differed from the repo replace the repo's, so
+  `git diff` shows them. Restart Hyprland (or any shell older than the stow)
+  before starting pi there, so it has the variable.
 
 ## Makefile Commands
 

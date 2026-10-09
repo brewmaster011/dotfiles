@@ -38,7 +38,7 @@ Interactive bootstrap script that:
 ## migrate-pi.sh
 
 One-off, per machine: moves pi's agent dir from `~/.pi/agent` to
-`~/.config/pi/agent` (where `PI_CODING_AGENT_DIR` from the common zshrc points),
+`~/.config/pi/agent` (where `PI_CODING_AGENT_DIR` from `common/.zshenv` points), removes a leftover `~/.pi/agent` link,
 re-points `~/.local/bin/pi`, and links the pi config tracked in `common`. Run it with every pi session closed. See
 "pi coding agent" in the top-level README.
 
