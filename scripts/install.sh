@@ -58,7 +58,7 @@ git submodule update --init --recursive
 # Prompt for packages to stow
 echo ""
 echo "Available stow packages:"
-echo "  common     - Cross-platform (nvim, zsh, alacritty, zellij)"
+echo "  common     - Cross-platform (nvim, zsh, alacritty, zellij, pi)"
 echo "  linux      - Linux-only (dunst, kanata, ranger, neofetch, runit, scripts)"
 echo "  macos      - macOS-specific (aerospace)"
 echo "  hyprland   - Hyprland/Wayland (hypr, waybar, wofi, feh)"
@@ -87,6 +87,10 @@ fi
 if [[ -n "$PACKAGES" ]]; then
     echo "Running: stow $PACKAGES -t ~"
     cd "$DOTFILES_DIR"
+    # pi's agent dir has to exist before common is stowed (see the Makefile)
+    if [[ " $PACKAGES " == *" common "* ]]; then
+        mkdir -p ~/.config/pi/agent
+    fi
     stow $PACKAGES -t ~
     echo ""
     echo "Done! Run 'nvim' to trigger lazy.nvim plugin installation."

@@ -12,7 +12,8 @@ cd ~/dotfiles
 # Run the bootstrap script (installs packages, initializes submodules, runs stow)
 ./scripts/install.sh
 
-# Or manually stow specific packages
+# Or manually stow specific packages (pi's dir first, see "pi coding agent")
+mkdir -p ~/.config/pi/agent
 stow common linux hyprland -t ~
 ```
 
@@ -20,7 +21,7 @@ stow common linux hyprland -t ~
 
 | Package | Platform | Contents |
 |---------|----------|----------|
-| `common` | All | Neovim, Zsh, Alacritty, Zellij |
+| `common` | All | Neovim, Zsh, Alacritty, Zellij, pi coding agent |
 | `linux` | Linux | Dunst, Kanata, Ranger, Neofetch, Runit services, Scripts |
 | `hyprland` | Linux | Hyprland, Waybar, Wofi, Hyprlock, Hypridle, Hyprpaper |
 | `dwm` | Linux | Picom, Xmodmap, .xinitrc |
@@ -58,7 +59,8 @@ dotfiles/
 │       ├── nvim/           # Neovim (lazy.nvim, native LSP)
 │       ├── zsh/            # Zsh (plugins as git submodules)
 │       ├── alacritty/      # Terminal emulator (base config, imports os.toml)
-│       └── zellij/         # Terminal multiplexer
+│       ├── zellij/         # Terminal multiplexer
+│       └── pi/agent/       # pi coding agent: settings, theme, footer extension
 │
 ├── linux/                  # Linux-specific
 │   └── .config/
@@ -168,6 +170,32 @@ To add a machine, create `<host>/.config/hypr/host.lua` and
 ## Shell environment
 
 - `PROJECTS_DIR` — base directory the `^g` fzf project-jump widget searches (defaults to `~/Documents/source`). Set it per-machine in the OS `zshrc.local` if your projects live elsewhere.
+- `PI_CODING_AGENT_DIR` — pi's config dir, `~/.config/pi/agent` on every machine (set in the common zshrc; see below).
+
+## pi coding agent
+
+`common` carries [pi](https://pi.dev)'s config: `settings.json` (preferences and
+the pi packages it installs at startup), the `gruvbox-pastel` theme and the
+`context-footer` extension (the status bar at the bottom). It lives in
+`~/.config/pi/agent` instead of pi's default `~/.pi/agent`.
+
+pi keeps its credentials (`auth.json`), sessions, its own install and caches in
+the same directory. This repo is public, so `.gitignore` ignores everything
+under `common/.config/pi/agent` except the tracked config. pi writes
+`settings.json` in place, so `/settings`, `pi install` and a new default model
+show up as changes here.
+
+- **New machine**: `~/.config/pi/agent` has to exist before `common` is stowed,
+  or stow turns `~/.config/pi` into a link to the repo and pi's credentials and
+  sessions end up in the worktree. `make stow` and `install.sh` create it; with
+  plain stow, `mkdir -p ~/.config/pi/agent` first. Then open a new shell and
+  install pi (the installer follows `PI_CODING_AGENT_DIR`).
+- **Machine still on `~/.pi/agent`**, or macOS (already on `~/.config/pi/agent`):
+  close pi and run `scripts/migrate-pi.sh`. It moves the directory, re-points
+  `~/.local/bin/pi` and links the tracked files. Copies that differed from the
+  repo replace the repo's, so `git diff` shows them. Until then the zshrc leaves
+  `PI_CODING_AGENT_DIR` unset there, so pi keeps working on the default; after
+  it, restart open shells before starting pi.
 
 ## Makefile Commands
 

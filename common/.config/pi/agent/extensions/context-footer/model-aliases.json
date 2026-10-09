@@ -1,0 +1,22 @@
+{
+  "github-copilot/claude-haiku-4.5": "Haiku 4.5",
+  "github-copilot/gemini-3.5-flash": "Gemini 3.5F",
+  "github-copilot/gemini-3.6-flash": "Gemini 3.6F",
+  "github-copilot/gemini-3.7-flash": "Gemini 3.7F",
+  "github-copilot/gemini-3.8-flash": "Gemini 3.8F",
+  "github-copilot/gpt-5-mini": "GPT-5 Mini",
+  "github-copilot/gpt-5.3-codex": "GPT-5.3 Codex",
+  "github-copilot/gpt-5.4": "GPT-5.4",
+  "github-copilot/gpt-5.4-mini": "GPT-5.4 mini",
+  "github-copilot/gpt-5.6-luna": "GPT-5.6 Luna",
+  "github-copilot/gpt-5.6-terra": "GPT-5.6 Terra",
+  "github-copilot/gpt-6-luna": "GPT-6 Luna",
+  "github-copilot/gpt-6-sol": "GPT-6 Sol",
+  "github-copilot/mai-code-1.1-flash": "MAI-Code 1.1F",
+  "llama.cpp/DavidAU/Qwen3.5-9B-The-Defiant-Fable-Uncensored-Heretic-NEO-IMATRIX-MAX-MTP-GGUF:Q4_K_M": "Qwen3.5-9B…Q4_K_M",
+  "llama.cpp/glm-4.7-flash": "GLM 4.7 Flash",
+  "llama.cpp/gpt-oss-20b": "GPT-OSS 20B",
+  "llama.cpp/HauhauCS/Gemma-4-E4B-Uncensored-HauhauCS-Aggressive:Q8_K_P": "Gemma-4-E4B…Q8_K_P",
+  "llama.cpp/qwen3-coder-30b": "Qwen3 Coder 30B",
+  "llama.cpp/unsloth/Qwen3.8-27B-GGUF:Q4_K_M": "Qwen3.8-27B…Q4_K_M"
+}

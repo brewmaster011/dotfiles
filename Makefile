@@ -5,6 +5,12 @@
 
 STOW_TARGET := $(HOME)
 
+# pi's agent dir has to exist before common is stowed: otherwise stow folds
+# ~/.config/pi into a link to this repo, and pi then writes its credentials,
+# sessions and install into the worktree (see "pi coding agent" in README.md)
+PI_AGENT_DIR := $(STOW_TARGET)/.config/pi/agent
+make_pi_dir = $(if $(filter common,$(PACKAGES)),@mkdir -p $(PI_AGENT_DIR))
+
 help:
 	@echo "Dotfiles Management"
 	@echo ""
@@ -16,7 +22,7 @@ help:
 	@echo "  make update                            - Update submodules and nvim plugins"
 	@echo ""
 	@echo "Available packages:"
-	@echo "  common     - Cross-platform (nvim, zsh, alacritty, zellij)"
+	@echo "  common     - Cross-platform (nvim, zsh, alacritty, zellij, pi)"
 	@echo "  linux      - Linux-only (dunst, kanata, ranger, neofetch, runit, scripts)"
 	@echo "  macos      - macOS-specific (aerospace)"
 	@echo "  hyprland   - Hyprland/Wayland (hypr, waybar, wofi, feh)"
@@ -36,6 +42,7 @@ stow:
 ifndef PACKAGES
 	$(error PACKAGES is required. Example: make stow PACKAGES='common linux')
 endif
+	$(make_pi_dir)
 	stow $(PACKAGES) -t $(STOW_TARGET)
 
 # Unstow + stow: picks up new files and removes links to files deleted from a package
@@ -43,6 +50,7 @@ restow:
 ifndef PACKAGES
 	$(error PACKAGES is required. Example: make restow PACKAGES='common linux')
 endif
+	$(make_pi_dir)
 	stow -R $(PACKAGES) -t $(STOW_TARGET)
 
 unstow:
