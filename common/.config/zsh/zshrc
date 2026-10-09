@@ -20,10 +20,11 @@ fi
 setopt PROMPT_SUBST
 
 # pi coding agent: config in ~/.config/pi/agent instead of pi's default
-# ~/.pi/agent (exported before startx so X sessions get it too). While
-# ~/.pi/agent still exists, scripts/migrate-pi.sh hasn't moved it yet, so pi
-# stays on the default until then.
-if [[ ! -e "$HOME/.pi/agent" ]]; then
+# ~/.pi/agent (exported before startx so X sessions get it too). A migrated
+# machine keeps ~/.pi/agent as a link to the new dir, so a pi started without
+# this variable still finds everything. Only a real ~/.pi/agent dir (not
+# migrated yet) keeps pi on the default.
+if [[ ! -d "$HOME/.pi/agent" || -L "$HOME/.pi/agent" ]]; then
     export PI_CODING_AGENT_DIR="$HOME/.config/pi/agent"
 fi
 

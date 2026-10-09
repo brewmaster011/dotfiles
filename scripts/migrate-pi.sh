@@ -42,7 +42,10 @@ if [ -d "$old" ] && [ ! -L "$old" ]; then
     fi
     mkdir -p "$(dirname "$new")"
     mv "$old" "$new"
-    echo "Moved $old to $new"
+    # A pi started without PI_CODING_AGENT_DIR (any shell opened before this)
+    # would otherwise create a fresh, empty ~/.pi/agent and use that
+    ln -s ../.config/pi/agent "$old"
+    echo "Moved $old to $new and linked $old to it"
 fi
 
 # 2. Point the installer's launcher link at the new location
@@ -87,6 +90,6 @@ if [ -n "$differs" ]; then
     echo "This machine's copies differed from the repo; review: git -C \"$repo\" diff"
 fi
 if [ "${PI_CODING_AGENT_DIR:-}" != "$new" ]; then
-    echo "Restart every open shell before starting pi: one opened before the move"
-    echo "lacks PI_CODING_AGENT_DIR, and pi would start a fresh ~/.pi/agent."
+    echo "Shells opened before the move lack PI_CODING_AGENT_DIR; pi still works"
+    echo "there through the ~/.pi/agent link, but restart them when convenient."
 fi

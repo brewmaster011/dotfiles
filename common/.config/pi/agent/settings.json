@@ -4,11 +4,11 @@
   "tuiMode": "fullscreen",
   "fullscreenScrollbar": "hidden",
   "fullscreenCopyOnSelect": true,
-  "defaultProvider": "github-copilot",
-  "defaultModel": "gpt-6-sol",
+  "defaultProvider": "anthropic",
+  "defaultModel": "claude-opus-5-5",
   "packages": [
     "npm:pi-subagents",
     "npm:pi-web-access"
   ],
-  "defaultThinkingLevel": "max"
+  "defaultThinkingLevel": "medium"
 }

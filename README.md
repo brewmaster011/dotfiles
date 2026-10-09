@@ -194,8 +194,9 @@ show up as changes here.
   close pi and run `scripts/migrate-pi.sh`. It moves the directory, re-points
   `~/.local/bin/pi` and links the tracked files. Copies that differed from the
   repo replace the repo's, so `git diff` shows them. Until then the zshrc leaves
-  `PI_CODING_AGENT_DIR` unset there, so pi keeps working on the default; after
-  it, restart open shells before starting pi.
+  `PI_CODING_AGENT_DIR` unset there, so pi keeps working on the default. The
+  script leaves `~/.pi/agent` as a link to the new dir, so a pi started from a
+  shell opened before the move still finds everything.
 
 ## Makefile Commands
 
