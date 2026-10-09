@@ -19,6 +19,14 @@ fi
 
 setopt PROMPT_SUBST
 
+# pi coding agent: config in ~/.config/pi/agent instead of pi's default
+# ~/.pi/agent (exported before startx so X sessions get it too). While
+# ~/.pi/agent still exists, scripts/migrate-pi.sh hasn't moved it yet, so pi
+# stays on the default until then.
+if [[ ! -e "$HOME/.pi/agent" ]]; then
+    export PI_CODING_AGENT_DIR="$HOME/.config/pi/agent"
+fi
+
 # Auto-start X on Linux TTY1 (for dwm)
 if [[ "$OS_TYPE" == "linux" ]] && [ -z "${DISPLAY}" ] && [ "${XDG_VTNR}" -eq 1 ]; then
   exec startx

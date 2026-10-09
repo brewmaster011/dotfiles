@@ -35,6 +35,13 @@ Interactive bootstrap script that:
 | Debian   | apt             |
 | macOS    | Homebrew        |
 
+## migrate-pi.sh
+
+One-off, per machine: moves pi's agent dir from `~/.pi/agent` to
+`~/.config/pi/agent` (where `PI_CODING_AGENT_DIR` from the common zshrc points),
+re-points `~/.local/bin/pi`, and links the pi config tracked in `common`. Run it with every pi session closed. See
+"pi coding agent" in the top-level README.
+
 ## Makefile
 
 | Command                            | Description                   |
@@ -76,6 +83,7 @@ Edit these files to customize which packages get installed.
 ```
 scripts/
   install.sh      # Main bootstrap script
+  migrate-pi.sh   # One-off move of pi's agent dir to ~/.config/pi/agent
   packages/
     base.txt      # Cross-platform packages
     linux.txt     # Linux packages
