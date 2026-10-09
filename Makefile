@@ -21,7 +21,7 @@ help:
 	@echo "  macos      - macOS-specific (aerospace)"
 	@echo "  hyprland   - Hyprland/Wayland (hypr, waybar, wofi, feh)"
 	@echo "  dwm        - X11/dwm (picom, xmodmap, .xinitrc)"
-	@echo "  framework  - Framework laptop host (hypr host.lua, waybar, color-calibration, easyeffects)"
+	@echo "  framework  - Framework laptop host (hypr host.lua, waybar, wluma, color-calibration, easyeffects)"
 	@echo "  cosmo      - Desktop host (hypr host.lua, waybar, NVIDIA env)"
 	@echo ""
 	@echo "Examples:"

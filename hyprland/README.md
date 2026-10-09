@@ -170,10 +170,17 @@ only locks when it suspends.
 
 Left: workspaces, window title  
 Center: clock (click for alternate date format)  
-Right: battery, power profile, backlight, volume, bluetooth, network, tray
+Right: set per host by the host package's `waybar/host.jsonc`:
+- Framework: battery, power profile, backlight, volume, bluetooth, network, VPN, tray
+- cosmo: CPU, memory, temperature, volume, bluetooth, network, tray
+
+The VPN icons are one `network#vpn-*` module per WireGuard profile (`Home`,
+`Remote`), matched by the interface NetworkManager names after the connection;
+each is hidden while its tunnel is down.
 
 Click actions:
-- Network icon: opens nm-connection-editor
+- Network and VPN icons: open nm-connection-editor
+- CPU and memory: open btop in a terminal
 - Bluetooth icon: opens blueman-manager
 - Volume icon: opens wiremix in terminal
 

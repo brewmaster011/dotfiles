@@ -42,6 +42,7 @@ Interactive bootstrap script that:
 | `make help`                        | Show usage and package list   |
 | `make install`                     | Run install.sh                |
 | `make stow PACKAGES='...'`         | Symlink packages to home      |
+| `make restow PACKAGES='...'`       | Restow after a pull (prunes links to deleted files) |
 | `make unstow PACKAGES='...'`       | Remove package symlinks       |
 | `make update`                      | Update submodules and plugins |
 
