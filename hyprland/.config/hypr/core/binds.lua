@@ -3,6 +3,7 @@ local HOME = os.getenv("HOME")
 local tile    = require("core.tile")
 local layouts = require("core.layouts")
 local tags    = require("core.tags")
+local bar     = require("core.bar")
 
 local mainMod     = "SUPER"
 local terminal    = "alacritty"
@@ -129,5 +130,5 @@ end)
 hl.bind(mainMod .. " + mouse:277",         hl.dsp.workspace.toggle_special("magic"))
 hl.bind(mainMod .. " + SHIFT + mouse:277", hl.dsp.window.move({ workspace = "special:magic" }))
 
--- Show/Hide waybar
-hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("killall -SIGUSR1 waybar"))
+-- Show/hide this tag's bar (core/bar.lua, dwm's pertag togglebar)
+hl.bind(mainMod .. " + B", bar.toggle)

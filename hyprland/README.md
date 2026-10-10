@@ -65,7 +65,7 @@ These services start automatically with Hyprland:
 
 - `pipewire` - Audio server
 - `dunst` - Notification daemon
-- `waybar` - Status bar
+- `waybar` - Status bar, one per monitor, started by `core/bar.lua`
 - `hyprpaper` - Wallpaper
 - `hypridle` - Idle manager
 - `hyprsunset` - Blue-light filter (neutral by default) and hypridle's screen blanking
@@ -160,7 +160,7 @@ Main modifier: `Super` (Windows key)
 |---------------------------|------------------|
 | `Super + Shift + L`       | Lock screen      |
 | `Super + Shift + Ctrl + S`| Suspend          |
-| `Super + B`               | Toggle waybar    |
+| `Super + B`               | Hide / show the bar for this tag |
 | `Super + Shift + I`       | Toggle relaxed idle profile |
 | `Super + N`               | Toggle blue-light filter (6000K); also restores a blanked screen |
 
