@@ -66,8 +66,15 @@ local function apply(ws, name)
     end
 end
 
-local function active_state()
-    local ws = hl.get_active_workspace()
+-- Set by core/tags.lua to redraw waybar's layout symbol (it requires us, so
+-- we can't require it back).
+M.on_change = function() end
+
+local ORDER   = { "tile", "float", "monocle" }
+local SYMBOLS = { tile = "[]=", float = "><>", monocle = "[M]" }
+
+local function active_state(ws)
+    ws = ws or hl.get_active_workspace()
     if not ws then return end
     local sel = selected[ws.id]
     if not sel then
@@ -91,7 +98,32 @@ function M.setlayout(name)
             return
         end
         apply(ws, sel.cur)
+        M.on_change()
     end
+end
+
+-- cycle(dir): the next (1) or previous (-1) layout in dwm's layouts[] order.
+function M.cycle(dir)
+    return function()
+        local ws, sel = active_state()
+        if not ws then return end
+        for i, name in ipairs(ORDER) do
+            if name == sel.cur then
+                M.setlayout(ORDER[(i - 1 + dir) % #ORDER + 1])()
+                return
+            end
+        end
+    end
+end
+
+-- dwm's bar symbol for ws's layout; monocle shows how many windows it holds.
+function M.symbol(ws)
+    local _, sel = active_state(ws)
+    if not sel then return "" end
+    if sel.cur == "monocle" and ws.windows > 0 then
+        return "[" .. ws.windows .. "]"
+    end
+    return SYMBOLS[sel.cur]
 end
 
 -- Keep the float layout floating: windows that open on, or move to, a float

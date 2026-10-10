@@ -42,6 +42,12 @@ you to whichever tag you view, like dwm's `tag ~0`.
   views that one tag.
 - The stack order in `lua:tile` is per monitor, like dwm's client list, so a
   window keeps its place in the stack when it comes along to another tag.
+- waybar shows each monitor's tags like dwm's bar (`waybar/dwmbar.sh`, fed by
+  `core/tags.lua`): viewed tags highlighted, tags with no windows hidden unless
+  viewed. Left click views a tag, right click adds or removes it from the view,
+  middle click moves the focused window there. The layout symbol after the tags
+  (`[]=`, `><>`, `[M]`, or monocle's window count like `[3]`) cycles the layout
+  on click (left forward, right back).
 Modules in `modules/` are enabled per host with `require("modules.<name>").setup(opts)`:
 
 | Module             | What it does                                                        |
@@ -192,7 +198,7 @@ only locks when it suspends.
 
 ## Waybar Modules
 
-Left: workspaces, window title  
+Left: dwm's tags and layout symbol (see Tags), window title  
 Center: clock (click for alternate date format)  
 Right: set per host by the host package's `waybar/host.jsonc`:
 - Framework: battery, power profile, backlight, volume, bluetooth, network, VPN, tray
