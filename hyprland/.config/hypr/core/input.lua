@@ -10,6 +10,13 @@ hl.config({
 
         sensitivity = 0, -- -1.0 - 1.0, 0 means no modification.
     },
+
+    -- unclutter: hide the pointer after 3 idle seconds or on typing; it comes
+    -- back on move.
+    cursor = {
+        inactive_timeout  = 3,
+        hide_on_key_press = true,
+    },
 })
 
 -- Example per-device config
