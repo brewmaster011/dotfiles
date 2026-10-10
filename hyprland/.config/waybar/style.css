@@ -17,19 +17,28 @@
   margin: 0px 4px;
 }
 
-#workspaces button {
-  all: initial;
+/* dwm's bar: custom/tag1..9 and custom/layout (dwmbar.sh) */
+#tags label {
   padding: 0 6px;
   margin: 0 1.5px;
   min-width: 9px;
 }
 
-#workspaces button.empty {
+#tags label.selected {
+  color: #FFF;
+}
+
+#tags label.selected:not(.occupied) {
   opacity: 0.5;
 }
 
-#workspaces button.active {
-  color: #FFF;
+#tags label.urgent {
+  color: #282828;
+  background-color: #d4be98;
+}
+
+#custom-layout {
+  margin-left: 6px;
 }
 
 #window {

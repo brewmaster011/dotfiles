@@ -4,8 +4,7 @@ local HOME = os.getenv("HOME")
 hl.on("hyprland.start", function()
     hl.exec_cmd("pipewire")
     hl.exec_cmd("dunst")
-    -- waybar races pipewire-pulse at session start; gate it on the pulse socket.
-    hl.exec_cmd([[bash -c 'until [ -S "$XDG_RUNTIME_DIR/pulse/native" ]; do sleep 0.25; done; waybar']])
+    -- waybar is started per monitor by core/bar.lua
     hl.exec_cmd("hyprpaper")
     hl.exec_cmd("hypridle")
     -- No config file on purpose: a profile would be re-applied daily at its time,
