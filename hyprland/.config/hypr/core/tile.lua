@@ -23,7 +23,9 @@ local M = {}
 local NMASTER = 1
 local MFACT   = 0.55
 
--- workspace id -> { order = { window ids, top of stack first }, nmaster, mfact }
+-- monitor id -> window ids, top of stack first (dwm's per-monitor client list)
+local stacks = {}
+-- workspace id -> { nmaster, mfact }
 local workspaces = {}
 
 local function target_id(target)
@@ -31,24 +33,39 @@ local function target_id(target)
     return window and tostring(window.stable_id) or ("target:" .. target.index)
 end
 
+local function window_monitor_id(window)
+    local ws = window.workspace
+    local mon = ws and ws.monitor or window.monitor
+    return mon and mon.id
+end
+
 local function workspace_state(ws_id)
     local key = ws_id or "none"
     local ws = workspaces[key]
     if not ws then
-        ws = { order = {}, nmaster = NMASTER, mfact = MFACT }
+        ws = { nmaster = NMASTER, mfact = MFACT }
         workspaces[key] = ws
     end
     return ws
 end
 
-local function ctx_workspace(ctx)
+local function stack_of(mon_id)
+    local key = mon_id or "none"
+    stacks[key] = stacks[key] or {}
+    return stacks[key], key
+end
+
+-- The workspace's settings, its monitor's stack and that monitor's id.
+local function ctx_state(ctx)
     for _, target in ipairs(ctx.targets) do
         local window = target.window
         if window and window.workspace then
-            return workspace_state(window.workspace.id)
+            local stack, mon_id = stack_of(window_monitor_id(window))
+            return workspace_state(window.workspace.id), stack, mon_id
         end
     end
-    return workspace_state(nil)
+    local stack, mon_id = stack_of(nil)
+    return workspace_state(nil), stack, mon_id
 end
 
 local function index_of(tbl, value)
@@ -57,17 +74,24 @@ local function index_of(tbl, value)
     end
 end
 
--- Drop ids that left the workspace and attach new ones at the top of the stack.
--- Returns id -> target for this pass.
-local function sync_order(ws, ctx)
+-- Drop ids of windows that are gone or left the monitor, and attach new ones at
+-- the top of the stack. Windows waiting on the monitor's other workspaces keep
+-- their place. Returns id -> target for this pass and the ids of this pass in
+-- stack order.
+local function sync_order(stack, mon_id, ctx)
     local targets = {}
     for _, target in ipairs(ctx.targets) do
         targets[target_id(target)] = target
     end
 
+    local on_monitor = {}
+    for _, w in ipairs(hl.get_windows()) do
+        if window_monitor_id(w) == mon_id then on_monitor[tostring(w.stable_id)] = true end
+    end
+
     local order = {}
-    for _, id in ipairs(ws.order) do
-        if targets[id] then table.insert(order, id) end
+    for _, id in ipairs(stack.order or {}) do
+        if targets[id] or on_monitor[id] then table.insert(order, id) end
     end
 
     -- ctx.targets is in insertion order, so attaching each unknown one at the
@@ -77,8 +101,13 @@ local function sync_order(ws, ctx)
         if not index_of(order, id) then table.insert(order, 1, id) end
     end
 
-    ws.order = order
-    return targets
+    stack.order = order
+
+    local visible = {}
+    for _, id in ipairs(order) do
+        if targets[id] then table.insert(visible, id) end
+    end
+    return targets, visible
 end
 
 local function active_id(ctx)
@@ -89,9 +118,9 @@ local function active_id(ctx)
 end
 
 local function tile(ctx)
-    local ws      = ctx_workspace(ctx)
-    local targets = sync_order(ws, ctx)
-    local n       = #ws.order
+    local ws, stack, mon_id = ctx_state(ctx)
+    local targets, order    = sync_order(stack, mon_id, ctx)
+    local n = #order
     if n == 0 then return end
 
     local area = ctx.area
@@ -102,7 +131,7 @@ local function tile(ctx)
 
     local masters = math.min(n, ws.nmaster)
     local my, ty = 0, 0
-    for i, id in ipairs(ws.order) do
+    for i, id in ipairs(order) do
         if i <= masters then
             local h = (area.h - my) / (masters - i + 1)
             targets[id]:place({ x = area.x, y = area.y + my, w = mw, h = h })
@@ -115,13 +144,19 @@ local function tile(ctx)
     end
 end
 
+-- Swap two ids in the monitor's stack.
+local function swap(stack, a, b)
+    local i, j = index_of(stack.order, a), index_of(stack.order, b)
+    stack.order[i], stack.order[j] = stack.order[j], stack.order[i]
+end
+
 local function layout_msg(ctx, msg)
-    local ws = ctx_workspace(ctx)
-    sync_order(ws, ctx)
+    local ws, stack, mon_id = ctx_state(ctx)
+    local _, order = sync_order(stack, mon_id, ctx)
 
     local command, arg = msg:match("^(%S+)%s*(%S*)")
     local id = active_id(ctx)
-    local i  = id and index_of(ws.order, id)
+    local i  = id and index_of(order, id)
 
     if command == "incnmaster" then
         ws.nmaster = math.max(ws.nmaster + (tonumber(arg) or 1), 0)
@@ -130,17 +165,15 @@ local function layout_msg(ctx, msg)
         if not delta then return "tile: mfact expects a delta like +0.05" end
         ws.mfact = math.min(math.max(ws.mfact + delta, 0.05), 0.95)
     elseif command == "zoom" then
-        if not i or #ws.order < 2 then return true end
-        if i == 1 then
-            ws.order[1], ws.order[2] = ws.order[2], ws.order[1]
-        else
-            table.remove(ws.order, i)
-            table.insert(ws.order, 1, id)
-        end
+        if not i or #order < 2 then return true end
+        -- the master swaps with the next tiled window, anything else goes on top
+        local zoomed = i == 1 and order[2] or id
+        table.remove(stack.order, index_of(stack.order, zoomed))
+        table.insert(stack.order, 1, zoomed)
     elseif command == "movestack" then
-        if not i or #ws.order < 2 then return true end
-        local j = (i - 1 + (tonumber(arg) or 1)) % #ws.order + 1
-        ws.order[i], ws.order[j] = ws.order[j], ws.order[i]
+        if not i or #order < 2 then return true end
+        local j = (i - 1 + (tonumber(arg) or 1)) % #order + 1
+        swap(stack, order[i], order[j])
     else
         return "tile: expected incnmaster, mfact, zoom or movestack"
     end
@@ -172,7 +205,7 @@ function M.focusstack(dir)
         end
 
         local list = {}
-        for _, id in ipairs(workspace_state(active.workspace.id).order) do
+        for _, id in ipairs(stack_of(window_monitor_id(active)).order or {}) do
             if windows[id] and not windows[id].floating then table.insert(list, windows[id]) end
         end
         for _, w in ipairs(all) do
