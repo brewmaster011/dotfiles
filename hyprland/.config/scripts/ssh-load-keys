@@ -1,6 +1,6 @@
 #!/bin/sh
 # ABOUTME: Boot-time SSH key loader for Hyprland
-# ABOUTME: Waits for ssh-agent socket then loads all SSH keys via SSH_ASKPASS
+# ABOUTME: Waits for ssh-agent socket then loads every key in ~/.ssh via SSH_ASKPASS
 
 # Wait up to 5 seconds for ssh-agent socket
 n=0
@@ -9,4 +9,17 @@ while [ ! -S "$HOME/.ssh/ssh_auth_sock" ] && [ $n -lt 50 ]; do
     n=$((n+1))
 done
 
-ssh-add ~/.ssh/github ~/.ssh/main ~/.ssh/remote ~/.ssh/remote_git ~/.ssh/work < /dev/null
+# Every private key with a .pub next to it that the agent doesn't hold yet, so
+# rerunning only asks for what's missing. One ssh-add call: it retries the last
+# passphrase on the next key, so keys sharing a passphrase need one prompt.
+loaded=$(ssh-add -l 2>/dev/null | awk '{print $2}')
+set --
+for pub in "$HOME"/.ssh/*.pub; do
+    key=${pub%.pub}
+    [ -f "$key" ] || continue
+    fp=$(ssh-keygen -lf "$pub" 2>/dev/null | awk '{print $2}')
+    case $loaded in *"$fp"*) continue ;; esac
+    set -- "$@" "$key"
+done
+
+[ $# -gt 0 ] && ssh-add "$@" < /dev/null
