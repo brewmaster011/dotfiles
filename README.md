@@ -12,7 +12,8 @@ cd ~/dotfiles
 # Run the bootstrap script (installs packages, initializes submodules, runs stow)
 ./scripts/install.sh
 
-# Or manually stow specific packages
+# Or manually stow specific packages (pi's dir first, see "pi coding agent")
+mkdir -p ~/.config/pi/agent
 stow common linux hyprland -t ~
 ```
 
@@ -20,11 +21,12 @@ stow common linux hyprland -t ~
 
 | Package | Platform | Contents |
 |---------|----------|----------|
-| `common` | All | Neovim, Zsh, Alacritty, Zellij |
+| `common` | All | Neovim, Zsh, Alacritty, Zellij, pi coding agent |
 | `linux` | Linux | Dunst, Kanata, Ranger, Neofetch, Runit services, Scripts |
 | `hyprland` | Linux | Hyprland, Waybar, Wofi, Hyprlock, Hypridle, Hyprpaper |
 | `dwm` | Linux | Picom, Xmodmap, .xinitrc |
-| `framework` | Linux | Color calibration (ICC profile), EasyEffects preset |
+| `framework` | Linux | Framework 13 laptop: Hyprland host.lua (desk layout + eDP-1 off when docked; laptop, kanata, wluma + split-workspaces modules), waybar battery + VPN modules, wluma config, ICC profile, EasyEffects preset |
+| `cosmo` | Linux | Desktop: Hyprland host.lua (desk layout; nvidia + split-workspaces modules), waybar modules |
 | `macos` | macOS | AeroSpace, Alacritty, Kanata, btop, posting, Zsh, git ignore, shell profile |
 | `scripts` | N/A | Bootstrap script, Makefile, package lists (not stowed) |
 
@@ -33,6 +35,9 @@ stow common linux hyprland -t ~
 ```bash
 # Framework laptop with Hyprland (Wayland)
 make stow PACKAGES='common linux hyprland framework'
+
+# cosmo desktop with Hyprland (Wayland, NVIDIA)
+make stow PACKAGES='common linux hyprland cosmo'
 
 # Desktop with dwm (X11)
 make stow PACKAGES='common linux dwm'
@@ -54,7 +59,8 @@ dotfiles/
 │       ├── nvim/           # Neovim (lazy.nvim, native LSP)
 │       ├── zsh/            # Zsh (plugins as git submodules)
 │       ├── alacritty/      # Terminal emulator (base config, imports os.toml)
-│       └── zellij/         # Terminal multiplexer
+│       ├── zellij/         # Terminal multiplexer
+│       └── pi/agent/       # pi coding agent: settings, theme, footer extension
 │
 ├── linux/                  # Linux-specific
 │   └── .config/
@@ -70,6 +76,10 @@ dotfiles/
 ├── hyprland/               # Hyprland (Wayland)
 │   ├── .config/
 │   │   ├── hypr/           # Hyprland, hyprlock, hypridle, hyprpaper
+│   │   │   ├── hyprland.lua    # Entry point: core, then host.lua
+│   │   │   ├── core/           # Shared config (env, autostart, look, input, binds, rules)
+│   │   │   ├── modules/        # Opt-in features a host enables (monitors, laptop, nvidia, kanata, wluma, split-workspaces)
+│   │   │   └── plugins/        # Lua plugins as git submodules
 │   │   ├── waybar/         # Status bar
 │   │   ├── wofi/           # App launcher
 │   │   └── feh/            # Wallpaper (fallback)
@@ -81,10 +91,18 @@ dotfiles/
 │       ├── picom/          # Compositor
 │       └── xmodmap/        # Keyboard mapping
 │
-├── framework/              # Framework laptop
+├── framework/              # Framework laptop (host package)
 │   └── .config/
+│       ├── hypr/host.lua       # Desk layout + built-in panel; laptop, kanata, wluma + split-workspaces modules
+│       ├── wluma/config.toml   # Auto-brightness (ambient light sensor)
+│       ├── waybar/host.jsonc   # modules-right incl. battery/backlight/VPN
 │       ├── color-calibration/  # ICC profile
 │       └── easyeffects/        # Audio preset
+│
+├── cosmo/                  # Desktop (host package)
+│   └── .config/
+│       ├── hypr/host.lua       # Desk layout; nvidia + split-workspaces modules
+│       └── waybar/host.jsonc   # modules-right
 │
 ├── macos/                  # macOS
 │   ├── .zprofile           # Homebrew shellenv + nvm
@@ -136,9 +154,52 @@ dotfiles/
 - [Kanata](https://github.com/jtroo/kanata) — home-row mods; requires approving the Karabiner system extension and granting Input Monitoring
 - btop (system monitor)
 
+## Per-host config
+
+`hyprland/.config/hypr/hyprland.lua` loads `core/` (shared by every machine) and
+then `~/.config/hypr/host.lua` if present. A host file only picks the features it
+needs from `modules/`, e.g.
+`require("modules.laptop").setup()`. Hyprland puts `~/.config/hypr/?.lua` and
+`~/.config/hypr/?/init.lua` on the Lua module path, so no `package.path` setup is
+needed. Waybar's `config.jsonc` includes
+`~/.config/waybar/host.jsonc`, which supplies `modules-right`. Each machine
+stows exactly one host package (`framework`, `cosmo`) that provides those two files.
+To add a machine, create `<host>/.config/hypr/host.lua` and
+`<host>/.config/waybar/host.jsonc` and stow it alongside `hyprland`.
+
 ## Shell environment
 
 - `PROJECTS_DIR` — base directory the `^g` fzf project-jump widget searches (defaults to `~/Documents/source`). Set it per-machine in the OS `zshrc.local` if your projects live elsewhere.
+- `PI_CODING_AGENT_DIR` — pi's config dir, `~/.config/pi/agent` on every machine. Set in `common/.zshenv` (every zsh, scripts included) and in Hyprland's `core/env.lua` for GUI launches; pi falls back to `~/.pi/agent` wherever it is unset (see below).
+
+## pi coding agent
+
+`common` carries [pi](https://pi.dev)'s config: `settings.json` (preferences and
+the pi packages it installs at startup), the `gruvbox-pastel` theme and the
+`context-footer` extension (the status bar at the bottom). It lives in
+`~/.config/pi/agent` instead of pi's default `~/.pi/agent`; nothing of pi's is
+kept in `~` itself. pi only honours `PI_CODING_AGENT_DIR` for that, so the
+variable is exported from `~/.zshenv` and the Hyprland environment. A pi started
+without it silently creates a fresh `~/.pi/agent`; if one appears, rerun
+`scripts/migrate-pi.sh` after closing pi.
+
+pi keeps its credentials (`auth.json`), sessions, its own install and caches in
+the same directory. This repo is public, so `.gitignore` ignores everything
+under `common/.config/pi/agent` except the tracked config. pi writes
+`settings.json` in place, so `/settings`, `pi install` and a new default model
+show up as changes here.
+
+- **New machine**: `~/.config/pi/agent` has to exist before `common` is stowed,
+  or stow turns `~/.config/pi` into a link to the repo and pi's credentials and
+  sessions end up in the worktree. `make stow` and `install.sh` create it; with
+  plain stow, `mkdir -p ~/.config/pi/agent` first. Then open a new shell and
+  install pi (the installer follows `PI_CODING_AGENT_DIR`).
+- **Machine still on `~/.pi/agent`**, or macOS (already on `~/.config/pi/agent`):
+  close pi and run `scripts/migrate-pi.sh` right after pulling and restowing
+  `common`. It moves the directory, re-points `~/.local/bin/pi` and links the
+  tracked files. Copies that differed from the repo replace the repo's, so
+  `git diff` shows them. Restart Hyprland (or any shell older than the stow)
+  before starting pi there, so it has the variable.
 
 ## Makefile Commands
 
@@ -146,16 +207,18 @@ dotfiles/
 make help                                  # Show available commands
 make install                               # Run bootstrap script
 make stow PACKAGES='common linux'          # Stow specified packages
+make restow PACKAGES='common linux'        # Restow after a pull (prunes links to deleted files)
 make unstow PACKAGES='common linux'        # Unstow specified packages
 make update                                # Update git submodules and nvim plugins
 ```
 
 ## Git Submodules
 
-Zsh plugins are managed as git submodules:
+Zsh and Hyprland plugins are managed as git submodules:
 
 - [fzf-tab](https://github.com/Aloxaf/fzf-tab) - FZF-powered tab completion
 - [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting) - Shell syntax highlighting
+- [split-monitor-workspaces](https://github.com/zjeffer/split-monitor-workspaces) - Per-monitor (dwm-style) workspaces for Hyprland's Lua config
 
 To update submodules:
 ```bash

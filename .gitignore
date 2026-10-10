@@ -21,6 +21,21 @@ hyprland/.config/hypr/workspaces.conf
 # Neovim plugin state (managed by lazy.nvim)
 common/.config/nvim/plugin/packer_compiled.lua
 
+# pi coding agent: common/.config/pi/agent is stowed into ~/.config/pi/agent,
+# where pi also keeps its credentials (auth.json), sessions, its own install and
+# caches. This repo is public, so everything there is ignored except the config
+# listed here; add a line to track something new.
+common/.config/pi/*
+!common/.config/pi/agent/
+common/.config/pi/agent/*
+!common/.config/pi/agent/settings.json
+!common/.config/pi/agent/extensions/
+!common/.config/pi/agent/themes/
+common/.config/pi/agent/extensions/**/node_modules/
+
+# pi's project-local state when it runs in this repo (subagent task dirs etc.)
+/.pi/
+
 # Secrets (add your secret files here)
 # .env
 # credentials.json

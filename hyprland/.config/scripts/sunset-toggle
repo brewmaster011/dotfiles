@@ -1,0 +1,17 @@
+#!/bin/sh
+# Toggle hyprsunset's blue-light tint (off by default: started with --identity).
+# Also restores gamma, so this key brings the screens back if hypridle's
+# gamma blank ever gets stuck.
+
+TEMPERATURE=6000
+
+hyprctl hyprsunset gamma 100 >/dev/null
+
+# "identity get" isn't in the wiki but is in hyprsunset's IPC (v0.4.0)
+if [ "$(hyprctl hyprsunset identity get)" = "true" ]; then
+    hyprctl hyprsunset temperature "$TEMPERATURE" >/dev/null
+    notify-send "Blue-light filter: on" "${TEMPERATURE}K"
+else
+    hyprctl hyprsunset identity true >/dev/null
+    notify-send "Blue-light filter: off"
+fi
