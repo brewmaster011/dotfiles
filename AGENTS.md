@@ -24,6 +24,11 @@ never commit credentials, tokens or other secrets.
 - Hyprland is configured in Lua (0.55+): `hyprland.lua` loads `core/`, then the
   host package's `host.lua`, which opts into `modules/`. Machine-specific
   behaviour belongs in a host package or a module, not in `core/`.
+- The Hyprland setup copies dwm (the `brewmaster011/dwm` repo): `core/tile.lua`,
+  `core/layouts.lua` and `core/tags.lua` are its tile layout, pertag layouts
+  and tags. Tags are workspaces 1-9 of each monitor's range; windows are moved
+  between them as the view changes, and their tags live on the window as
+  Hyprland tags `tag1`..`tag9`. Lua state is lost on every config reload.
 - `/usr/share/hypr/stubs/hl.meta.lua` doesn't list dispatcher arguments; check
   the Hyprland source for the installed version. `window.float` takes `on`/`off`,
   `window.fullscreen` takes `set`/`unset`, and unknown values silently become
