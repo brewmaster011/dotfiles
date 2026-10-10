@@ -2,6 +2,7 @@
 local HOME = os.getenv("HOME")
 local tile    = require("core.tile")
 local layouts = require("core.layouts")
+local tags    = require("core.tags")
 
 local mainMod     = "SUPER"
 local terminal    = "alacritty"
@@ -23,26 +24,12 @@ hl.bind(mainMod .. " + F",     layouts.setlayout("float"))
 hl.bind(mainMod .. " + M",     layouts.setlayout("monocle"))
 hl.bind(mainMod .. " + SPACE", layouts.setlayout())
 
--- View / send the window to the adjacent workspace, no wrapping (dwm
--- focusadjacenttag). modules/split-workspaces replaces these with per-monitor ones.
-local function adjacent_workspace(delta, move)
-    return function()
-        local ws = hl.get_active_workspace()
-        if not ws or ws.special then return end
-        local target = ws.id + delta
-        if target < 1 or target > 9 then return end
-        if move then
-            hl.dispatch(hl.dsp.window.move({ workspace = target, follow = false }))
-        else
-            hl.dispatch(hl.dsp.focus({ workspace = target }))
-        end
-    end
-end
-
-hl.bind(mainMod .. " + left",          adjacent_workspace(-1))
-hl.bind(mainMod .. " + right",         adjacent_workspace(1))
-hl.bind(mainMod .. " + SHIFT + left",  adjacent_workspace(-1, true))
-hl.bind(mainMod .. " + SHIFT + right", adjacent_workspace(1, true))
+-- View / send the window's tags one tag over, no wrapping (dwm
+-- focusadjacenttag; only while viewing a single tag).
+hl.bind(mainMod .. " + left",          tags.viewadjacent(-1))
+hl.bind(mainMod .. " + right",         tags.viewadjacent(1))
+hl.bind(mainMod .. " + SHIFT + left",  tags.tagadjacent(-1))
+hl.bind(mainMod .. " + SHIFT + right", tags.tagadjacent(1))
 
 -- dwm tile layout (core/tile.lua): J/K walk the stack, H/L size the master
 -- area, I/D add/remove masters, Shift + Return zooms to master.
@@ -56,16 +43,24 @@ hl.bind(mainMod .. " + i",              hl.dsp.layout("incnmaster +1"))
 hl.bind(mainMod .. " + d",              hl.dsp.layout("incnmaster -1"))
 hl.bind(mainMod .. " + SHIFT + Return", hl.dsp.layout("zoom"))
 
--- Switch to most recent workspace
-hl.bind(mainMod .. " + TAB", hl.dsp.focus({ workspace = "previous" }))
-
--- Global workspaces with mainMod + [0-9], move window with mainMod + SHIFT + [0-9].
--- modules/split-workspaces unbinds and replaces these with per-monitor ones.
-for i = 1, 10 do
-    local key = i % 10 -- 10 maps to key 0
-    hl.bind(mainMod .. " + " .. key,         hl.dsp.focus({ workspace = i }))
-    hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
+-- dwm tags (core/tags.lua), per monitor: each of workspaces 1-9 is a tag.
+--   Super + 1-9                 view that tag
+--   Super + Ctrl + 1-9          add/remove the tag from the view
+--   Super + Shift + 1-9         put the window on that tag only
+--   Super + Ctrl + Shift + 1-9  add/remove the tag from the window
+--   Super + 0                   view every tag
+--   Super + Shift + 0           put the window on every tag (it follows you)
+--   Super + Tab                 back to the previous view
+for i = 1, 9 do
+    local mask = tags.bit(i)
+    hl.bind(mainMod .. " + " .. i,                tags.view(mask))
+    hl.bind(mainMod .. " + CTRL + " .. i,         tags.toggleview(mask))
+    hl.bind(mainMod .. " + SHIFT + " .. i,        tags.tag(mask))
+    hl.bind(mainMod .. " + CTRL + SHIFT + " .. i, tags.toggletag(mask))
 end
+hl.bind(mainMod .. " + 0",         tags.view(tags.ALL))
+hl.bind(mainMod .. " + SHIFT + 0", tags.tag(tags.ALL))
+hl.bind(mainMod .. " + TAB",       tags.view(0))
 
 -- Cycle focus between monitors, dwm-style (comma = previous, period = next).
 -- (Verified live: hyprctl dispatch takes a Lua expression under the Lua config
@@ -74,31 +69,10 @@ end
 hl.bind(mainMod .. " + comma",  hl.dsp.focus({ monitor = "-1" }))
 hl.bind(mainMod .. " + period", hl.dsp.focus({ monitor = "+1" }))
 
--- Move the active window to the next/previous monitor, following it there.
--- Lands the window on whatever workspace is currently active on the target
--- monitor - the same place a mouse drag between monitors would put it.
-local function move_window_to_monitor(offset)
-    return function()
-        local cur_mon = hl.get_active_monitor()
-        if not cur_mon then return end
-
-        local mons = hl.get_monitors()
-        local idx
-        for i, m in ipairs(mons) do
-            if m.id == cur_mon.id then idx = i break end
-        end
-        if not idx then return end
-
-        local target = mons[((idx - 1 + offset) % #mons) + 1]
-        local target_ws = target.active_workspace
-        if not target_ws then return end
-
-        hl.dispatch(hl.dsp.window.move({ workspace = target_ws.name, follow = true }))
-    end
-end
-
-hl.bind(mainMod .. " + SHIFT + comma",  move_window_to_monitor(-1))
-hl.bind(mainMod .. " + SHIFT + period", move_window_to_monitor(1))
+-- Send the active window to the next/previous monitor, onto the tags it is
+-- viewing (dwm tagmon), following it there.
+hl.bind(mainMod .. " + SHIFT + comma",  tags.tagmon(-1))
+hl.bind(mainMod .. " + SHIFT + period", tags.tagmon(1))
 
 -- Special workspace (scratchpad)
 hl.bind(mainMod .. " + S",         hl.dsp.workspace.toggle_special("magic"))
@@ -144,7 +118,7 @@ hl.bind("CTRL + SHIFT + Print", hl.dsp.exec_cmd([[grim - | satty --filename - --
 hl.bind("SHIFT + Print",       hl.dsp.exec_cmd([[grim -l 1 - | tee "]] .. shotDir .. [[/$(date +'%Y%m%d_%H%M%S').png" | wl-copy && notify-send "Success" "Screenshot saved and copied to clipboard"]]))
 
 -- MX Master 4 bindings
-hl.bind("mouse:278",                       hl.dsp.focus({ workspace = "previous" }))
+hl.bind("mouse:278",                       tags.view(0))
 hl.bind(mainMod .. " + SHIFT + mouse:278", hl.dsp.window.close())
 
 hl.bind("mouse:277", function()
