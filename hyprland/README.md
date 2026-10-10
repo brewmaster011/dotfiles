@@ -22,6 +22,26 @@ package). `core/tile.lua` is the default layout: dwm's `tile` as a Lua layout
 (`lua:tile`), with nmaster/mfact per workspace. `core/layouts.lua` switches each
 workspace between tile, float and monocle like dwm's pertag `setlayout`.
 Swallowing (Alacritty) also comes from the dwm config.
+
+### Tags
+
+`core/tags.lua` gives Hyprland dwm's tags. Each monitor's workspaces 1-9 are its
+tags; a window can carry several of them, and a monitor can view several at
+once. The active workspace shows the whole view: windows with a viewed tag are
+moved onto it as the view changes, everything else waits on the workspace of
+its lowest tag. A window on every tag (`Super + Shift + 0`) therefore follows
+you to whichever tag you view, like dwm's `tag ~0`.
+
+- A window's tags are stored on it as Hyprland tags `tag1`..`tag9` (see
+  `hyprctl clients`), so they survive config reloads. A window with none is on
+  its workspace's tag only.
+- New windows get the tags being viewed, as in dwm.
+- Moving a window some other way (mouse drag, a window rule) to a workspace its
+  tags don't cover gives it just that workspace's tag.
+- Switching workspaces any other way (waybar, scrolling, the touchpad swipe)
+  views that one tag.
+- The stack order in `lua:tile` is per monitor, like dwm's client list, so a
+  window keeps its place in the stack when it comes along to another tag.
 Modules in `modules/` are enabled per host with `require("modules.<name>").setup(opts)`:
 
 | Module             | What it does                                                        |
@@ -31,7 +51,7 @@ Modules in `modules/` are enabled per host with `require("modules.<name>").setup
 | `nvidia`           | NVIDIA Wayland env vars                                             |
 | `kanata`           | Swallows kanata's F24 home-row-mod marker key                       |
 | `wluma`            | Starts wluma: automatic screen + keyboard backlight from the ambient light sensor, learned from manual changes (config in the host package) |
-| `split-workspaces` | Per-monitor workspaces via the `plugins/split-monitor-workspaces` submodule; replaces the global `Super + 0-9` binds |
+| `split-workspaces` | Per-monitor workspaces via the `plugins/split-monitor-workspaces` submodule, so each monitor has its own tags 1-9 |
 
 ## Autostart
 
@@ -86,18 +106,22 @@ Main modifier: `Super` (Windows key)
 | `Super + T` / `F` / `M`  | Tile / float / monocle layout (per workspace)   |
 | `Super + Space`          | Swap back to the previous layout                |
 
-### Workspaces
+### Tags (dwm-style, per monitor)
 
 | Binding              | Action                        |
 |----------------------|-------------------------------|
-| `Super + 1-9,0`      | Switch to workspace 1-10 (with `split-workspaces`: 1-9 on the focused monitor) |
-| `Super + Shift + 1-9,0` | Move window to workspace 1-10 (with `split-workspaces`: silently, on the same monitor) |
+| `Super + 1-9`        | View tag 1-9                  |
+| `Super + Ctrl + 1-9` | Add / remove the tag from the view |
+| `Super + Shift + 1-9` | Put the window on that tag only, without following |
+| `Super + Ctrl + Shift + 1-9` | Add / remove the tag from the window |
+| `Super + 0`          | View every tag                |
+| `Super + Shift + 0`  | Put the window on every tag (it follows you) |
+| `Super + Tab`        | Back to the previous view     |
+| `Super + Left` / `Right` | View the adjacent tag (no wrap; single-tag views only) |
+| `Super + Shift + Left` / `Right` | Shift the window's tags one over, without following |
 | `Super + Comma` / `Period` | Focus previous / next monitor |
-| `Super + Shift + Comma` / `Period` | Move window to previous / next monitor |
-| `Super + Left` / `Right` | Switch to the adjacent workspace (no wrap)  |
-| `Super + Shift + Left` / `Right` | Send window to the adjacent workspace, without following |
-| `Super + Tab`        | Switch to previous workspace  |
-| `Super + Scroll`     | Cycle through workspaces      |
+| `Super + Shift + Comma` / `Period` | Send window to previous / next monitor, onto its view, following it |
+| `Super + Scroll`     | Cycle through workspaces (views that tag) |
 
 ### Scratchpad (Special Workspace)
 
@@ -118,7 +142,7 @@ Main modifier: `Super` (Windows key)
 
 | Binding                     | Action                       |
 |-----------------------------|------------------------------|
-| `Mouse:278`                 | Previous workspace           |
+| `Mouse:278`                 | Previous view (as `Super + Tab`) |
 | `Super + Shift + Mouse:278` | Close active window          |
 | `Mouse:277`                 | Cycle to next window         |
 | `Super + Mouse:277`         | Toggle scratchpad            |

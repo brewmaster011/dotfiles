@@ -77,7 +77,7 @@ dotfiles/
 │   ├── .config/
 │   │   ├── hypr/           # Hyprland, hyprlock, hypridle, hyprpaper
 │   │   │   ├── hyprland.lua    # Entry point: core, then host.lua
-│   │   │   ├── core/           # Shared config (env, autostart, look, input, binds, rules)
+│   │   │   ├── core/           # Shared config (env, autostart, look, input, binds, rules, dwm tile/layouts/tags)
 │   │   │   ├── modules/        # Opt-in features a host enables (monitors, laptop, nvidia, kanata, wluma, split-workspaces)
 │   │   │   └── plugins/        # Lua plugins as git submodules
 │   │   ├── waybar/         # Status bar
