@@ -325,6 +325,7 @@ M.bit = bit
 -- happens whenever one of the files changes.
 local BAR_DIR    = (os.getenv("XDG_RUNTIME_DIR") or "/tmp") .. "/hypr-tags"
 local BAR_SIGNAL = 8 -- the "signal" of those waybar modules
+local WAYBAR_DIR = (os.getenv("XDG_RUNTIME_DIR") or "/tmp") .. "/waybar" -- core/bar.lua's configs
 os.execute("mkdir -p '" .. BAR_DIR .. "'")
 
 local published = {}
@@ -365,7 +366,8 @@ local function publish()
         end
     end
     if changed then
-        hl.exec_cmd("pkill -RTMIN+" .. BAR_SIGNAL .. " -x waybar")
+        -- Only core/bar.lua's waybars: one without these modules would die of it.
+        hl.exec_cmd("pkill -RTMIN+" .. BAR_SIGNAL .. " -f '^waybar -c " .. WAYBAR_DIR .. "/'")
     end
 end
 
