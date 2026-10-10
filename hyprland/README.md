@@ -107,6 +107,8 @@ Main modifier: `Super` (Windows key)
 | `Super + J` / `K`        | Focus next / previous window in the stack       |
 | `Super + Shift + J` / `K`| Move window down / up the stack                 |
 | `Super + H` / `L`        | Shrink / grow the master area (mfact)           |
+| `Super + Ctrl + K` / `J` | Grow / shrink the window's height (cfact)       |
+| `Super + Ctrl + O`       | Reset the window's height                       |
 | `Super + I` / `D`        | Add / remove a master (0 and up)                |
 | `Super + Shift + Return` | Zoom: swap focused window with the master       |
 | `Super + T` / `F` / `M`  | Tile / float / monocle layout (per workspace)   |

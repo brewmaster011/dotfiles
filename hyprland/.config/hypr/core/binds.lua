@@ -33,13 +33,17 @@ hl.bind(mainMod .. " + SHIFT + left",  tags.tagadjacent(-1))
 hl.bind(mainMod .. " + SHIFT + right", tags.tagadjacent(1))
 
 -- dwm tile layout (core/tile.lua): J/K walk the stack, H/L size the master
--- area, I/D add/remove masters, Shift + Return zooms to master.
+-- area, Ctrl + K/J grow/shrink the window's height (Ctrl + O resets it), I/D
+-- add/remove masters, Shift + Return zooms to master.
 hl.bind(mainMod .. " + j",              tile.focusstack(1))
 hl.bind(mainMod .. " + k",              tile.focusstack(-1))
 hl.bind(mainMod .. " + SHIFT + j",      hl.dsp.layout("movestack +1"))
 hl.bind(mainMod .. " + SHIFT + k",      hl.dsp.layout("movestack -1"))
 hl.bind(mainMod .. " + h",              hl.dsp.layout("mfact -0.05"), { repeating = true })
 hl.bind(mainMod .. " + l",              hl.dsp.layout("mfact +0.05"), { repeating = true })
+hl.bind(mainMod .. " + CTRL + k",       hl.dsp.layout("cfact +0.25"), { repeating = true })
+hl.bind(mainMod .. " + CTRL + j",       hl.dsp.layout("cfact -0.25"), { repeating = true })
+hl.bind(mainMod .. " + CTRL + o",       hl.dsp.layout("cfact 0"))
 hl.bind(mainMod .. " + i",              hl.dsp.layout("incnmaster +1"))
 hl.bind(mainMod .. " + d",              hl.dsp.layout("incnmaster -1"))
 hl.bind(mainMod .. " + SHIFT + Return", hl.dsp.layout("zoom"))
