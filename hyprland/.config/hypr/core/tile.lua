@@ -5,11 +5,14 @@
 -- rather than a per-window flag: the first nmaster windows of the stack order
 -- are masters, whatever those windows are. New windows attach at the top of
 -- the stack, like dwm's attach(). nmaster and mfact are kept per workspace
--- (dwm's pertag patch).
+-- (dwm's pertag patch). Each window has a cfact (dwm's cfacts patch): its share
+-- of the height of its column, 1 by default.
 --
 -- Layout messages (hl.dsp.layout("...")):
 --   incnmaster <+n|-n>   change nmaster, never below 0
 --   mfact <+f|-f>        change the master area ratio, clamped to 0.05-0.95
+--   cfact <+f|-f|0>      change the focused window's cfact, clamped to
+--                        0.25-4; 0 resets it to 1
 --   zoom                 move the focused window to the top of the stack,
 --                        or swap the master with the next window
 --   movestack <+1|-1>    move the focused window down/up the stack
@@ -22,6 +25,10 @@ local M = {}
 
 local NMASTER = 1
 local MFACT   = 0.55
+
+-- window id -> cfact, for windows that don't have the default 1
+local cfacts = {}
+local function cfact(id) return cfacts[id] or 1 end
 
 -- monitor id -> window ids, top of stack first (dwm's per-monitor client list)
 local stacks = {}
@@ -91,7 +98,11 @@ local function sync_order(stack, mon_id, ctx)
 
     local order = {}
     for _, id in ipairs(stack.order or {}) do
-        if targets[id] or on_monitor[id] then table.insert(order, id) end
+        if targets[id] or on_monitor[id] then
+            table.insert(order, id)
+        else
+            cfacts[id] = nil
+        end
     end
 
     -- ctx.targets is in insertion order, so attaching each unknown one at the
@@ -129,17 +140,23 @@ local function tile(ctx)
         mw = ws.nmaster > 0 and area.w * ws.mfact or 0
     end
 
+    -- Each column's height is shared out by cfact (dwm's getfacts).
     local masters = math.min(n, ws.nmaster)
+    local mfacts, sfacts = 0, 0
+    for i, id in ipairs(order) do
+        if i <= masters then mfacts = mfacts + cfact(id) else sfacts = sfacts + cfact(id) end
+    end
+
     local my, ty = 0, 0
     for i, id in ipairs(order) do
         if i <= masters then
-            local h = (area.h - my) / (masters - i + 1)
+            local h = (area.h - my) * cfact(id) / mfacts
             targets[id]:place({ x = area.x, y = area.y + my, w = mw, h = h })
-            my = my + h
+            my, mfacts = my + h, mfacts - cfact(id)
         else
-            local h = (area.h - ty) / (n - i + 1)
+            local h = (area.h - ty) * cfact(id) / sfacts
             targets[id]:place({ x = area.x + mw, y = area.y + ty, w = area.w - mw, h = h })
-            ty = ty + h
+            ty, sfacts = ty + h, sfacts - cfact(id)
         end
     end
 end
@@ -164,6 +181,12 @@ local function layout_msg(ctx, msg)
         local delta = tonumber(arg)
         if not delta then return "tile: mfact expects a delta like +0.05" end
         ws.mfact = math.min(math.max(ws.mfact + delta, 0.05), 0.95)
+    elseif command == "cfact" then
+        local delta = tonumber(arg)
+        if not delta then return "tile: cfact expects a delta like +0.25, or 0" end
+        if not id then return true end
+        local f = delta == 0 and 1 or math.min(math.max(cfact(id) + delta, 0.25), 4)
+        cfacts[id] = f ~= 1 and f or nil
     elseif command == "zoom" then
         if not i or #order < 2 then return true end
         -- the master swaps with the next tiled window, anything else goes on top
@@ -175,7 +198,7 @@ local function layout_msg(ctx, msg)
         local j = (i - 1 + (tonumber(arg) or 1)) % #order + 1
         swap(stack, order[i], order[j])
     else
-        return "tile: expected incnmaster, mfact, zoom or movestack"
+        return "tile: expected incnmaster, mfact, cfact, zoom or movestack"
     end
 
     return true
