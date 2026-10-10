@@ -21,6 +21,8 @@
 -- nmaster and mfact (core/layouts.lua, core/tile.lua). Viewing several tags
 -- uses the workspace of the lowest one, or keeps the current one when it is
 -- still in the view.
+local layouts = require("core.layouts")
+
 local M = {}
 
 local TAGS = 9 -- split-workspaces' workspace_count must match
@@ -73,12 +75,16 @@ local function window_mask(w)
     return bit(t)
 end
 
+-- Redraws waybar's tags soon; defined with the bar below.
+local schedule
+
 local function store(w, mask)
     local old = stored_mask(w)
     for t = 1, TAGS do
         local want = mask & bit(t) ~= 0
         if (old & bit(t) ~= 0) ~= want then
             hl.dispatch(hl.dsp.window.tag({ tag = (want and "+" or "-") .. "tag" .. t, window = w }))
+            schedule()
         end
     end
 end
@@ -155,6 +161,7 @@ local function apply(mon, v)
         if not ok then error(err) end
     end
     sync(mon)
+    schedule()
 
     if focused and focused.workspace and focused.workspace.id == target and not focused.active then
         hl.dispatch(hl.dsp.focus({ window = focused }))
@@ -281,8 +288,116 @@ function M.tagmon(offset)
     end
 end
 
+-- A click on waybar's dwm bar (waybar/dwmbar.sh): act on that output, as
+-- dwm's ClkTagBar and ClkLtSymbol binds do on the monitor whose bar was clicked.
+--   click(output, "view"|"toggleview"|"tag"|"toggletag", tag)
+--   click(output, "layout", 1|-1)   next/previous layout
+local CLICKS = { view = M.view, toggleview = M.toggleview, tag = M.tag, toggletag = M.toggletag }
+
+function M.click(output, action, arg)
+    local fn
+    if action == "layout" then
+        fn = layouts.cycle(arg)
+    elseif CLICKS[action] and arg >= 1 and arg <= TAGS then
+        fn = CLICKS[action](bit(arg))
+    else
+        return
+    end
+    local mon = hl.get_active_monitor()
+    if output ~= "" and mon and mon.name ~= output then
+        -- Moving a window there would drag it to another monitor; dwm doesn't either.
+        if action == "tag" or action == "toggletag" then return end
+        hl.dispatch(hl.dsp.focus({ monitor = output }))
+    end
+    fn()
+end
+
 M.ALL = ALL
 M.bit = bit
+
+-- ---------------------------------------------------------------------------
+-- dwm's bar: each monitor's tags for waybar
+-- ---------------------------------------------------------------------------
+
+-- $XDG_RUNTIME_DIR/hypr-tags/<monitor> holds "view occupied urgent layout":
+-- three tag masks and the layout symbol. waybar's custom/tag and custom/layout
+-- modules read it (waybar/dwmbar.sh) when sent SIGRTMIN+BAR_SIGNAL, which
+-- happens whenever one of the files changes.
+local BAR_DIR    = (os.getenv("XDG_RUNTIME_DIR") or "/tmp") .. "/hypr-tags"
+local BAR_SIGNAL = 8 -- the "signal" of those waybar modules
+os.execute("mkdir -p '" .. BAR_DIR .. "'")
+
+local published = {}
+
+local function publish()
+    local occupied = {}
+    for _, w in ipairs(hl.get_windows()) do
+        local ws = w.workspace
+        if w.mapped and tagged(ws) and ws.monitor then
+            local key = ws.monitor.id .. ":" .. split(ws.id)
+            occupied[key] = (occupied[key] or 0) | window_mask(w)
+        end
+    end
+    local u = hl.get_urgent_window()
+
+    local changed = false
+    for _, mon in ipairs(hl.get_monitors()) do
+        local v, ws = state(mon)
+        local line = "0 0 0 -"
+        if v then
+            local base = split(ws.id)
+            local urgent = 0
+            if u and tagged(u.workspace) and u.workspace.monitor
+                and u.workspace.monitor.id == mon.id and split(u.workspace.id) == base then
+                urgent = window_mask(u)
+            end
+            line = string.format("%d %d %d %s", v[v.sel].mask, occupied[mon.id .. ":" .. base] or 0,
+                urgent, layouts.symbol(ws))
+        end
+        if published[mon.name] ~= line then
+            local f = io.open(BAR_DIR .. "/" .. mon.name, "w")
+            if f then
+                f:write(line, "\n")
+                f:close()
+                published[mon.name] = line
+                changed = true
+            end
+        end
+    end
+    if changed then
+        hl.exec_cmd("pkill -RTMIN+" .. BAR_SIGNAL .. " -x waybar")
+    end
+end
+
+-- Nothing is published before Hyprland is up: on a cold start the config loads
+-- before the compositor and its input devices exist, and an hl.timer created
+-- then crashes Hyprland or leaves it half set up (no keyboards). A reload
+-- finds monitors already there and can start at once.
+local ready = #hl.get_monitors() > 0
+
+-- One write per burst of events: a view change moves many windows.
+local pending
+function schedule()
+    if not ready or pending then return end
+    pending = hl.timer(function()
+        pending = nil
+        publish()
+    end, { timeout = 20, type = "oneshot" })
+end
+
+for _, event in ipairs({
+    "config.reloaded", "monitor.added", "monitor.removed", "workspace.active",
+    "workspace.move_to_monitor", "window.open", "window.close", "window.destroy",
+    "window.move_to_workspace", "window.urgent", "window.active", "window.update_rules",
+}) do
+    hl.on(event, schedule)
+end
+layouts.on_change = schedule
+hl.on("hyprland.start", function()
+    ready = true
+    schedule()
+end)
+schedule()
 
 -- ---------------------------------------------------------------------------
 -- Keeping Hyprland's own moves in line

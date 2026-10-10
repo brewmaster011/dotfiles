@@ -4,48 +4,104 @@
   "position": "top",
   "spacing": 0,
   "height": 26,
-  "modules-left": ["hyprland/workspaces", "hyprland/window"],
+  "modules-left": ["group/tags", "custom/layout", "hyprland/window"],
   "modules-center": ["clock"],
   "include": ["~/.config/waybar/host.jsonc"],
-  "hyprland/workspaces": {
-    "on-click": "activate",
-    "format": "{icon}",
-    "format-icons": {
-      "default": "",
-      "1": "1",
-      "2": "2",
-      "3": "3",
-      "4": "4",
-      "5": "5",
-      "6": "6",
-      "7": "7",
-      "8": "8",
-      "9": "9",
-      // split-monitor-workspaces gives each monitor a real, distinct ID range
-      // (not just a label): with workspace_count = 9 (hypr/modules/split-workspaces.lua),
-      // the first monitor in the host's monitor_priority (hypr/host.lua) gets ids 1-9,
-      // the second 10-18, the third 19-27. If either changes, this map needs updating too.
-      "10": "1",
-      "11": "2",
-      "12": "3",
-      "13": "4",
-      "14": "5",
-      "15": "6",
-      "16": "7",
-      "17": "8",
-      "18": "9",
-      // The plugin never forgets a configured monitor's priority, so after
-      // undocking the framework's eDP-1 (listed third) gets 19-27.
-      "19": "1",
-      "20": "2",
-      "21": "3",
-      "22": "4",
-      "23": "5",
-      "24": "6",
-      "25": "7",
-      "26": "8",
-      "27": "9",
-    },
+  // dwm's bar (dwmbar.sh, fed by hypr/core/tags.lua). Tags: left click views a
+  // tag, right click adds it to the view, middle click moves the focused window
+  // there. Layout symbol: left/right click cycles forward/back.
+  "group/tags": {
+    "orientation": "horizontal",
+    "modules": ["custom/tag1", "custom/tag2", "custom/tag3", "custom/tag4", "custom/tag5", "custom/tag6", "custom/tag7", "custom/tag8", "custom/tag9"]
+  },
+  "custom/layout": {
+    "exec": "~/.config/waybar/dwmbar.sh layout",
+    "signal": 8,
+    "escape": true,
+    "tooltip": false,
+    "on-click": "~/.config/waybar/dwmbar.sh layout next",
+    "on-click-right": "~/.config/waybar/dwmbar.sh layout prev"
+  },
+  "custom/tag1": {
+    "exec": "~/.config/waybar/dwmbar.sh tag 1",
+    "return-type": "json",
+    "signal": 8,
+    "tooltip": false,
+    "on-click": "~/.config/waybar/dwmbar.sh tag 1 view",
+    "on-click-right": "~/.config/waybar/dwmbar.sh tag 1 toggleview",
+    "on-click-middle": "~/.config/waybar/dwmbar.sh tag 1 tag"
+  },
+  "custom/tag2": {
+    "exec": "~/.config/waybar/dwmbar.sh tag 2",
+    "return-type": "json",
+    "signal": 8,
+    "tooltip": false,
+    "on-click": "~/.config/waybar/dwmbar.sh tag 2 view",
+    "on-click-right": "~/.config/waybar/dwmbar.sh tag 2 toggleview",
+    "on-click-middle": "~/.config/waybar/dwmbar.sh tag 2 tag"
+  },
+  "custom/tag3": {
+    "exec": "~/.config/waybar/dwmbar.sh tag 3",
+    "return-type": "json",
+    "signal": 8,
+    "tooltip": false,
+    "on-click": "~/.config/waybar/dwmbar.sh tag 3 view",
+    "on-click-right": "~/.config/waybar/dwmbar.sh tag 3 toggleview",
+    "on-click-middle": "~/.config/waybar/dwmbar.sh tag 3 tag"
+  },
+  "custom/tag4": {
+    "exec": "~/.config/waybar/dwmbar.sh tag 4",
+    "return-type": "json",
+    "signal": 8,
+    "tooltip": false,
+    "on-click": "~/.config/waybar/dwmbar.sh tag 4 view",
+    "on-click-right": "~/.config/waybar/dwmbar.sh tag 4 toggleview",
+    "on-click-middle": "~/.config/waybar/dwmbar.sh tag 4 tag"
+  },
+  "custom/tag5": {
+    "exec": "~/.config/waybar/dwmbar.sh tag 5",
+    "return-type": "json",
+    "signal": 8,
+    "tooltip": false,
+    "on-click": "~/.config/waybar/dwmbar.sh tag 5 view",
+    "on-click-right": "~/.config/waybar/dwmbar.sh tag 5 toggleview",
+    "on-click-middle": "~/.config/waybar/dwmbar.sh tag 5 tag"
+  },
+  "custom/tag6": {
+    "exec": "~/.config/waybar/dwmbar.sh tag 6",
+    "return-type": "json",
+    "signal": 8,
+    "tooltip": false,
+    "on-click": "~/.config/waybar/dwmbar.sh tag 6 view",
+    "on-click-right": "~/.config/waybar/dwmbar.sh tag 6 toggleview",
+    "on-click-middle": "~/.config/waybar/dwmbar.sh tag 6 tag"
+  },
+  "custom/tag7": {
+    "exec": "~/.config/waybar/dwmbar.sh tag 7",
+    "return-type": "json",
+    "signal": 8,
+    "tooltip": false,
+    "on-click": "~/.config/waybar/dwmbar.sh tag 7 view",
+    "on-click-right": "~/.config/waybar/dwmbar.sh tag 7 toggleview",
+    "on-click-middle": "~/.config/waybar/dwmbar.sh tag 7 tag"
+  },
+  "custom/tag8": {
+    "exec": "~/.config/waybar/dwmbar.sh tag 8",
+    "return-type": "json",
+    "signal": 8,
+    "tooltip": false,
+    "on-click": "~/.config/waybar/dwmbar.sh tag 8 view",
+    "on-click-right": "~/.config/waybar/dwmbar.sh tag 8 toggleview",
+    "on-click-middle": "~/.config/waybar/dwmbar.sh tag 8 tag"
+  },
+  "custom/tag9": {
+    "exec": "~/.config/waybar/dwmbar.sh tag 9",
+    "return-type": "json",
+    "signal": 8,
+    "tooltip": false,
+    "on-click": "~/.config/waybar/dwmbar.sh tag 9 view",
+    "on-click-right": "~/.config/waybar/dwmbar.sh tag 9 toggleview",
+    "on-click-middle": "~/.config/waybar/dwmbar.sh tag 9 tag"
   },
   "hyprland/window": {
     "format": "{}",

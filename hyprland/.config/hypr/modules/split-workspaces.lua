@@ -5,8 +5,8 @@
 local M = {}
 
 local defaults = {
-    -- core/tags.lua's TAGS and waybar's hyprland/workspaces format-icons (ids
-    -- 10-18 back to 1-9) assume 9; update both if this changes.
+    -- core/tags.lua's TAGS and waybar's custom/tag1..9 assume 9; update both
+    -- if this changes.
     workspace_count = 9,
     -- The library's own default is true (all tags always shown per monitor,
     -- dwm-tag-bar style). We want the old Hyprland behavior instead:
