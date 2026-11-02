@@ -4,15 +4,17 @@
 #   dwmbar.sh tag N ACTION       click: view, toggleview, tag or toggletag on tag N
 #   dwmbar.sh layout             print the layout symbol (custom/layout)
 #   dwmbar.sh layout next|prev   click: cycle the layout
-# core/tags.lua keeps "view occupied urgent layout" for each monitor in
+# core/tags.lua keeps "view occupied urgent focused layout" for each monitor in
 # $XDG_RUNTIME_DIR/hypr-tags/<output> and sends waybar SIGRTMIN+8 on change.
+# focused is 1 on the focused monitor: like dwm's selmon its bar draws the
+# selected tag inverted, so a glance tells the monitors apart.
 
 click() {
     exec hyprctl eval "require('core.tags').click('$WAYBAR_OUTPUT_NAME', '$1', $2)" >/dev/null
 }
 
 read_state() {
-    read -r view occupied urgent layout < "$XDG_RUNTIME_DIR/hypr-tags/$WAYBAR_OUTPUT_NAME" 2>/dev/null || exit 0
+    read -r view occupied urgent focused layout < "$XDG_RUNTIME_DIR/hypr-tags/$WAYBAR_OUTPUT_NAME" 2>/dev/null || exit 0
 }
 
 case $1 in
@@ -29,6 +31,7 @@ tag)
     [ $((view & bit)) -ne 0 ]     && class="$class\"selected\","
     [ $((occupied & bit)) -ne 0 ] && class="$class\"occupied\","
     [ $((urgent & bit)) -ne 0 ]   && class="$class\"urgent\","
+    [ "$focused" = 1 ]            && class="$class\"focused\","
     printf '{"text": "%s", "class": [%s]}\n' "$n" "${class%,}"
     ;;
 layout)
