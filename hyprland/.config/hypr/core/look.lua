@@ -23,7 +23,10 @@ hl.config({
         rounding_power = 2,
 
         active_opacity   = 1.0,
-        inactive_opacity = 0.95,
+        inactive_opacity = 1.0,
+        -- dwm has no equivalent; the focused window stands out by not being dimmed
+        dim_inactive     = true,
+        dim_strength     = 0.12,
 
         shadow = {
             enabled      = true,

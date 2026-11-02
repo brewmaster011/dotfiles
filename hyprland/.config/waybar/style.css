@@ -24,7 +24,9 @@
   min-width: 9px;
 }
 
-#tags label.selected {
+/* dwm's selmon: the only white tag anywhere is the viewed one on the focused
+   monitor (inverting it would look like urgent) */
+#tags label.selected.focused {
   color: #FFF;
 }
 
@@ -32,7 +34,8 @@
   opacity: 0.5;
 }
 
-#tags label.urgent {
+#tags label.urgent,
+#tags label.selected.focused.urgent {
   color: #282828;
   background-color: #d4be98;
 }

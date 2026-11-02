@@ -319,10 +319,11 @@ M.bit = bit
 -- dwm's bar: each monitor's tags for waybar
 -- ---------------------------------------------------------------------------
 
--- $XDG_RUNTIME_DIR/hypr-tags/<monitor> holds "view occupied urgent layout":
--- three tag masks and the layout symbol. waybar's custom/tag and custom/layout
--- modules read it (waybar/dwmbar.sh) when sent SIGRTMIN+BAR_SIGNAL, which
--- happens whenever one of the files changes.
+-- $XDG_RUNTIME_DIR/hypr-tags/<monitor> holds "view occupied urgent focused
+-- layout": three tag masks, 1 on the focused monitor (dwm's selmon, whose bar
+-- draws the selected tag inverted) and the layout symbol. waybar's custom/tag
+-- and custom/layout modules read it (waybar/dwmbar.sh) when sent
+-- SIGRTMIN+BAR_SIGNAL, which happens whenever one of the files changes.
 local BAR_DIR    = (os.getenv("XDG_RUNTIME_DIR") or "/tmp") .. "/hypr-tags"
 local BAR_SIGNAL = 8 -- the "signal" of those waybar modules
 local WAYBAR_DIR = (os.getenv("XDG_RUNTIME_DIR") or "/tmp") .. "/waybar" -- core/bar.lua's configs
@@ -340,11 +341,13 @@ local function publish()
         end
     end
     local u = hl.get_urgent_window()
+    local focused = hl.get_active_monitor()
 
     local changed = false
     for _, mon in ipairs(hl.get_monitors()) do
         local v, ws = state(mon)
-        local line = "0 0 0 -"
+        local sel = (focused and focused.id == mon.id) and 1 or 0
+        local line = string.format("0 0 0 %d -", sel)
         if v then
             local base = split(ws.id)
             local urgent = 0
@@ -352,8 +355,8 @@ local function publish()
                 and u.workspace.monitor.id == mon.id and split(u.workspace.id) == base then
                 urgent = window_mask(u)
             end
-            line = string.format("%d %d %d %s", v[v.sel].mask, occupied[mon.id .. ":" .. base] or 0,
-                urgent, layouts.symbol(ws))
+            line = string.format("%d %d %d %d %s", v[v.sel].mask, occupied[mon.id .. ":" .. base] or 0,
+                urgent, sel, layouts.symbol(ws))
         end
         if published[mon.name] ~= line then
             local f = io.open(BAR_DIR .. "/" .. mon.name, "w")
@@ -388,7 +391,7 @@ function schedule()
 end
 
 for _, event in ipairs({
-    "config.reloaded", "monitor.added", "monitor.removed", "workspace.active",
+    "config.reloaded", "monitor.added", "monitor.removed", "monitor.focused", "workspace.active",
     "workspace.move_to_monitor", "window.open", "window.close", "window.destroy",
     "window.move_to_workspace", "window.urgent", "window.active", "window.update_rules",
 }) do
