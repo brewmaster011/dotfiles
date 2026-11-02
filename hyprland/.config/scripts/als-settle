@@ -1,0 +1,10 @@
+#!/bin/sh
+# Framework 13 (AMD): the HID ambient light sensor reads 0 after resume until
+# the kernel has let it runtime-suspend (3 s idle) and power back up. wluma
+# polls it every 800 ms and keeps it awake forever. Freeze wluma for a few
+# seconds after resume so the sensor gets its idle window; wluma reads the
+# recovered sensor through its existing handle. STOP and CONT are in the same
+# command on purpose so wluma can never be left frozen.
+pkill -STOP -x wluma || exit 0
+sleep 5
+pkill -CONT -x wluma
