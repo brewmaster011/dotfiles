@@ -78,7 +78,9 @@ loses its config mid-session.
    `linux/` stays with runit's ignored `supervise/` files; delete it. Anything
    under `common/.config/pi/` is something a tool installed into a folded pi
    dir (e.g. an extension): move it to `~/.config/pi/agent/` after step 4.
-   Delete what's left.
+   An ignored `common/.config/zsh/zshrc.local` (where `~/.config/zsh` was a
+   folded link) is your machine-local file: move it to `~/.config/zsh/` after
+   step 4. Delete what's left.
 4. Stow the new layers next to the ones still stowed:
    `make stow PACKAGES='common dev desktop'` (Mac: `'common dev macos'`)
 5. Linux: runit's ssh-agent ran from the old `linux/` path and stops when that goes:
