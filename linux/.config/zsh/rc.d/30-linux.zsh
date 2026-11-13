@@ -1,4 +1,4 @@
-# Linux-specific zshrc settings
+# Linux-specific zshrc settings (sourced from rc.d by common's zshrc)
 
 # Mozilla smooth scrolling with touchpad
 export MOZ_USE_XINPUT2=1

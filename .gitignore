@@ -36,6 +36,10 @@ common/.config/pi/agent/extensions/**/node_modules/
 # pi's project-local state when it runs in this repo (subagent task dirs etc.)
 /.pi/
 
+# Machine-local zsh settings (sourced last by zshrc). On a machine that only
+# stows common, ~/.config/zsh is a link into common, so this lands in the repo.
+*/.config/zsh/zshrc.local
+
 # Secrets (add your secret files here)
 # .env
 # credentials.json
