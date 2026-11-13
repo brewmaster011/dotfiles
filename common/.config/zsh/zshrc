@@ -7,25 +7,25 @@ case "$(uname -s)" in
     Darwin*) export OS_TYPE="macos";;
 esac
 
-# OS-specific settings
+# This file is all a server gets (only common stowed), so it may only depend
+# on zsh and git: everything else is used only when it's installed.
+
+# Homebrew path (Apple Silicon); macOS uses Keychain for SSH. The Linux
+# desktops' ssh-agent socket is set by desktop (env.d).
 if [[ "$OS_TYPE" == "macos" ]]; then
-    # Homebrew path (Apple Silicon)
     eval "$(/opt/homebrew/bin/brew shellenv)" 2>/dev/null
-    # macOS uses Keychain for SSH - no custom socket needed
-else
-    # Linux SSH agent socket (managed by runit service)
-    export SSH_AUTH_SOCK="$HOME/.ssh/ssh_auth_sock"
 fi
+
+# ~/.local/bin: pipx/uv user installs, and nvim where it isn't packaged new
+# enough. First, so the checks for optional tools below see it.
+typeset -U path PATH   # no duplicates, also when a layer assigns PATH
+path=("$HOME/.local/bin" $path)
 
 setopt PROMPT_SUBST
 
-# Auto-start X on Linux TTY1 (for dwm)
-if [[ "$OS_TYPE" == "linux" ]] && [ -z "${DISPLAY}" ] && [ "${XDG_VTNR}" -eq 1 ]; then
-  exec startx
-fi
-
-
-export EDITOR=nvim
+# The first editor that's installed (a bare server may only have vi)
+for EDITOR in nvim vim vi; do (( $+commands[$EDITOR] )) && break; done
+export EDITOR
 
 # Enable colors and change prompt:
 autoload -U colors && colors	# Load colors
@@ -40,6 +40,7 @@ setopt interactive_comments
 HISTSIZE=10000000
 SAVEHIST=10000000
 HISTFILE=~/.cache/zsh/history
+[[ -d ~/.cache/zsh ]] || mkdir -p ~/.cache/zsh
 
 for file in $(ls -p ~/.config/zsh/aliases | grep -v /); do
 	source ~/.config/zsh/aliases/$file
@@ -92,9 +93,14 @@ preexec() { echo -ne '\e[5 q' ;} # Use beam shape cursor for each new prompt.
 autoload edit-command-line; zle -N edit-command-line
 bindkey '^e' edit-command-line
 
-# Load zsh plugins (managed as git submodules)
-source "$HOME/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh"
-source "$HOME/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+# Load zsh plugins (managed as git submodules; missing if the repo was cloned
+# without --recursive). fzf-tab needs fzf itself.
+if (( $+commands[fzf] )) && [[ -r ~/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh ]]; then
+    source ~/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh
+fi
+if [[ -r ~/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+    source ~/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
 source "$HOME/.config/zsh/kubectl_autocomplete"
 
 # disable sort when completing `git checkout`
@@ -104,7 +110,11 @@ zstyle ':completion:*:descriptions' format '[%d]'
 # set list-colors to enable filename colorizing
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 # preview directory's content with eza when completing cd
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
+if (( $+commands[eza] )); then
+    zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
+else
+    zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls -1 --color=always $realpath'
+fi
 # switch group using `,` and `.`
 zstyle ':fzf-tab:*' switch-group ',' '.'
 # extra configuration for fzf-tab
@@ -172,13 +182,16 @@ fzf_cd() {
 zle -N fzf_cd
 bindkey '^g' fzf_cd
 
-# ~/.local/bin: pipx/uv user installs (both Linux and macOS)
-export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$HOME/.cache/dotnet:$HOME/.cache/dotnet/tools:$PATH"
+export PATH="$HOME/.cargo/bin:$HOME/.cache/dotnet:$HOME/.cache/dotnet/tools:$PATH"
 export DOTNET_ROOT="$HOME/.cache/dotnet"
 export FZF_DEFAULT_OPTS='--height 30% --layout=reverse --border'
 export ZSH_COMPDUMP="$HOME/.cache/zsh/zcompdump"
 
-eval "$(fzf --zsh)"
+# fzf's key bindings and completion (fzf 0.48+; older ones lack --zsh)
+if (( $+commands[fzf] )) && _fzf_zsh="$(fzf --zsh 2>/dev/null)"; then
+    eval "$_fzf_zsh"
+fi
+unset _fzf_zsh
 
 # The other stow packages (macos, dev, desktop, a WM, a host) each drop a file
 # in rc.d, named NN-<package>.zsh so they load in layer order: 10 OS, 20 dev,

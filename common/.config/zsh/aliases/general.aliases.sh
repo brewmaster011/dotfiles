@@ -28,7 +28,7 @@ alias fix_stty='stty sane'                  # fix_stty:     Restore terminal set
 alias fix_term='echo -e "\033c"'            # fix_term:     Reset the conosle.  Similar to the reset command
 alias cic='set completion-ignore-case On'   # cic:          Make tab-completion case-insensitive
 alias src='source ~/.zshrc'                # src:          Reload .bashrc file
-alias vim='nvim'
+command -v nvim >/dev/null 2>&1 && alias vim='nvim'   # vim: nvim where installed
 alias grep='grep --color=auto'
 alias diff='diff --color=auto'
 alias df='df -h'
