@@ -9,5 +9,8 @@ export PATH="$HOME/.aspire/bin:$PATH"
 # Project directory for the ^g fzf project-jump widget
 export PROJECTS_DIR="$HOME/Documents/src"
 
+# kubectl completion
+source ~/.config/zsh/kubectl_autocomplete
+
 # Argo CLI completion
 [[ -f ~/.config/zsh/argo_autocomplete ]] && source ~/.config/zsh/argo_autocomplete

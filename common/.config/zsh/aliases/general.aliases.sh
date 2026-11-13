@@ -33,10 +33,10 @@ alias grep='grep --color=auto'
 alias diff='diff --color=auto'
 alias df='df -h'
 alias du='du -h'
-alias urxvt='alacritty'
 alias pretty='jq -R '"'"'. as $line | try (fromjson) catch $line'"'"''   # Pretty print JSON logs
 
-# Kubernetes aliases
-alias k="kubectl"
-alias ke="kubens"
-alias kc="kubectx"
+# GNU only (Linux)
+if [ "$OS_TYPE" = linux ]; then
+    alias free='free -h'                    # free:         Human-readable memory
+    alias perm='stat --printf "%a %n \n "'  # perm:         Octal permissions (GNU stat)
+fi

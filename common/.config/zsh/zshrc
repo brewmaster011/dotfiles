@@ -101,7 +101,6 @@ fi
 if [[ -r ~/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
     source ~/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi
-source "$HOME/.config/zsh/kubectl_autocomplete"
 
 # disable sort when completing `git checkout`
 zstyle ':completion:*:git-checkout:*' sort false
@@ -120,6 +119,8 @@ zstyle ':fzf-tab:*' switch-group ',' '.'
 # extra configuration for fzf-tab
 zstyle ':fzf-tab:*' continous-trigger '/'
 zstyle ':fzf-tab:*' fzf-pad 4
+# systemd service preview (Linux)
+zstyle ':fzf-tab:complete:systemctl-*:*' fzf-preview 'SYSTEMD_COLORS=1 systemctl status $word'
 
 # arrows search history
 autoload -U up-line-or-beginning-search

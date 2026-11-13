@@ -2,7 +2,7 @@
 # ABOUTME: Excludes runtime files, caches, and auto-generated configs
 
 # Runit runtime files
-linux/.config/runit/**/supervise/
+desktop/.config/runit/**/supervise/
 
 # Common runtime/temporary files
 *.log
