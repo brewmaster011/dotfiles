@@ -14,6 +14,7 @@ vim.opt.wrap = false
 vim.opt.backup = false
 vim.opt.swapfile = false
 vim.opt.undodir = os.getenv("HOME") .. "/.cache/nvim/undodir"
+vim.fn.mkdir(vim.o.undodir, "p") -- nvim only creates its default undodir
 vim.opt.undofile = true
 
 vim.opt.hlsearch = true

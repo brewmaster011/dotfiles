@@ -1,6 +1,6 @@
 # Dotfiles
 
-Personal dotfiles managed with [GNU Stow](https://www.gnu.org/software/stow/). Modular packages allow mixing and matching configurations for different machines (Linux desktop, laptop, Raspberry Pi, macOS).
+Personal dotfiles managed with [GNU Stow](https://www.gnu.org/software/stow/). The packages are layers: every machine stows `common`, and each layer on top only adds to the ones below, so a server stows `common` alone and a desktop stacks `dev`, `desktop`, a window manager and its host package on it.
 
 ## Quick Start
 
@@ -12,66 +12,113 @@ cd ~/dotfiles
 # Run the bootstrap script (installs packages, initializes submodules, runs stow)
 ./scripts/install.sh
 
-# Or manually stow specific packages (pi's dir first, see "pi coding agent")
-mkdir -p ~/.config/pi/agent
-stow common linux hyprland -t ~
+# Or stow the packages yourself. The dirs first, or stow links them into the
+# repo: ~/.config always, pi's dirs with dev (see "pi coding agent")
+mkdir -p ~/.config/pi/agent/extensions
+stow common dev desktop hyprland cosmo -t ~
 ```
 
 ## Stow Packages
 
-| Package | Platform | Contents |
-|---------|----------|----------|
-| `common` | All | Neovim, Zsh, Alacritty, Zellij, pi coding agent |
-| `linux` | Linux | Dunst, Kanata, Ranger, Neofetch, Runit services, Scripts |
-| `hyprland` | Linux | Hyprland, Waybar, Wofi, Hyprlock, Hypridle, Hyprpaper |
-| `dwm` | Linux | Picom, Xmodmap, .xinitrc |
-| `framework` | Linux | Framework 13 laptop: Hyprland host.lua (desk layout + eDP-1 off when docked; laptop, kanata, wluma + split-workspaces modules), waybar battery + VPN modules, wluma config, ICC profile, EasyEffects preset |
-| `cosmo` | Linux | Desktop: Hyprland host.lua (desk layout; nvidia + split-workspaces modules), waybar modules |
-| `macos` | macOS | AeroSpace, Alacritty, Kanata, btop, posting, Zsh, git ignore, shell profile |
-| `scripts` | N/A | Bootstrap script, Makefile, package lists (not stowed) |
+| Layer | Package | Contents |
+|-------|---------|----------|
+| every machine | `common` | Zsh (prompt, vi mode, completion, plugins, fzf when installed), Neovim options and keymaps (no plugins), server aliases. Needs only zsh and git |
+| machines you work on | `dev` | Neovim plugins (lazy.nvim, LSP, treesitter), Zellij, pi coding agent, yazi, ranger, btop, neofetch, toolchain PATHs, `^g` project jump |
+| OS / GUI | `desktop` | Linux desktop: Alacritty, Dunst, Kanata, Pipewire, Runit ssh-agent, statusbar + playerctl scripts |
+| OS / GUI | `macos` | AeroSpace, Alacritty, Kanata, posting, kubectl, Zsh, git ignore, shell profile |
+| window manager | `hyprland` | Hyprland, Waybar, Wofi, Hyprlock, Hypridle, Hyprpaper |
+| window manager | `dwm` | Picom, Xmodmap, .xinitrc, startx on TTY1 |
+| host | `framework` | Framework 13 laptop: Hyprland host.lua (desk layout + eDP-1 off when docked; laptop, kanata, wluma + split-workspaces modules), waybar battery + VPN modules, wluma config, ICC profile, EasyEffects preset, thermal profile aliases |
+| host | `cosmo` | Desktop: Hyprland host.lua (desk layout; nvidia + split-workspaces modules), waybar modules |
+| — | `scripts` | Bootstrap script, Makefile, package lists (not stowed) |
+
+A layer never undoes one below it. `common` is what a server gets, so it must
+start cleanly with nothing but zsh and git: every other tool it uses (fzf, eza,
+nvim, docker, ...) is only used when it's installed.
 
 ## Per-Machine Examples
 
 ```bash
+# Server (homelab nodes; SSH for emergencies only)
+make stow PACKAGES='common'
+
+# Headless dev box (the agent user on debbie)
+make stow PACKAGES='common dev'
+
 # Framework laptop with Hyprland (Wayland)
-make stow PACKAGES='common linux hyprland framework'
+make stow PACKAGES='common dev desktop hyprland framework'
 
 # cosmo desktop with Hyprland (Wayland, NVIDIA)
-make stow PACKAGES='common linux hyprland cosmo'
+make stow PACKAGES='common dev desktop hyprland cosmo'
 
 # Desktop with dwm (X11)
-make stow PACKAGES='common linux dwm'
-
-# Raspberry Pi / Headless server
-make stow PACKAGES='common linux'
+make stow PACKAGES='common dev desktop dwm'
 
 # macOS
-make stow PACKAGES='common macos'
+make stow PACKAGES='common dev macos'
 ```
+
+`make stow`/`restow` and `install.sh` create `~/.config` first: a new server
+user has none, and stowing `common` alone would otherwise link all of
+`~/.config` into this public repo. With plain stow, `mkdir -p ~/.config` first.
+
+### Moving a machine from the old layout (`common linux ...`)
+
+Only `common` and the OS package (`linux`, or `macos` on the Mac) changed
+shape; the window manager and host packages stay stowed, so Hyprland never
+loses its config mid-session.
+
+1. Close every pi (its config links are in the old `common`), and commit or
+   stash anything uncommitted under `common/`, `linux/` or `macos/` in the
+   worktree.
+2. Before pulling, unstow the packages that move:
+   `make unstow PACKAGES='common linux'` (Mac: `'common macos'`)
+3. Pull (or switch the worktree to the new branch), then look for files git
+   left behind in the old dirs: `git status --short --ignored common linux macos`.
+   `linux/` stays with runit's ignored `supervise/` files; delete it. Anything
+   under `common/.config/pi/` is something a tool installed into a folded pi
+   dir (e.g. an extension): move it to `~/.config/pi/agent/` after step 4.
+   An ignored `common/.config/zsh/zshrc.local` (where `~/.config/zsh` was a
+   folded link) is your machine-local file: move it to `~/.config/zsh/` after
+   step 4. Delete what's left.
+4. Stow the new layers next to the ones still stowed:
+   `make stow PACKAGES='common dev desktop'` (Mac: `'common dev macos'`)
+5. Linux: runit's ssh-agent ran from the old `linux/` path and stops when that goes:
+   log out and back in (or restart the user `runsvdir`), then load the keys
+   again (`~/.config/scripts/ssh-load-keys` on Hyprland, or `ssh-add`).
+6. The tracked `zshrc.local` files of `linux` and `macos` became `rc.d` files;
+   `~/.config/zsh/zshrc.local` is now untracked and yours, for machine-local
+   settings (see "Shell environment").
 
 ## Directory Structure
 
 ```
 dotfiles/
-├── common/                 # Cross-platform configs
+├── common/                 # Every machine, servers too (needs only zsh + git)
+│   ├── .zshenv             # Sources ~/.config/zsh/env.d/*.zsh
 │   ├── .zshrc              # Sources ~/.config/zsh/zshrc
 │   └── .config/
-│       ├── nvim/           # Neovim (lazy.nvim, native LSP)
-│       ├── zsh/            # Zsh (plugins as git submodules)
-│       ├── alacritty/      # Terminal emulator (base config, imports os.toml)
-│       ├── zellij/         # Terminal multiplexer
-│       └── pi/agent/       # pi coding agent: settings, theme, footer extension
+│       ├── nvim/           # Neovim: init.lua + lua/base (options, keymaps); lua/dev if dev is stowed
+│       └── zsh/            # zshrc (sources rc.d/*.zsh), aliases (incl. server), plugins as submodules
 │
-├── linux/                  # Linux-specific
+├── dev/                    # Machines you work on (desktops, Mac, agent@debbie)
 │   └── .config/
-│       ├── alacritty/      # OS-specific window settings (os.toml)
+│       ├── nvim/           # lua/dev (lazy.nvim + plugins), after/plugin, lua/lsp, lazy-lock.json
+│       ├── zsh/            # env.d/20-dev.zsh (PI_CODING_AGENT_DIR), rc.d/20-dev.zsh (PATHs, ^g)
+│       ├── zellij/         # Terminal multiplexer
+│       ├── pi/agent/       # pi coding agent: settings, theme, footer extension
+│       ├── yazi/, ranger/  # File managers
+│       └── btop/, neofetch/
+│
+├── desktop/                # Linux desktop, shared by hyprland and dwm
+│   └── .config/
+│       ├── alacritty/      # Terminal (base config + os.toml)
 │       ├── dunst/          # Notifications
 │       ├── kanata/         # Keyboard remapper (home row mods)
-│       ├── ranger/         # File manager
-│       ├── neofetch/       # System info
+│       ├── pipewire/       # Starts wireplumber + pipewire-pulse (no systemd)
 │       ├── runit/          # User services (SSH agent)
 │       ├── scripts/        # Statusbar, playerctl hooks
-│       └── zsh/            # Linux-only aliases + zshrc.local
+│       └── zsh/            # SSH_AUTH_SOCK (env.d), MOZ_USE_XINPUT2 (rc.d), desktop aliases
 │
 ├── hyprland/               # Hyprland (Wayland)
 │   ├── .config/
@@ -89,7 +136,8 @@ dotfiles/
 │   ├── .xinitrc            # X session startup
 │   └── .config/
 │       ├── picom/          # Compositor
-│       └── xmodmap/        # Keyboard mapping
+│       ├── xmodmap/        # Keyboard mapping
+│       └── zsh/            # rc.d/40-dwm.zsh: startx on TTY1
 │
 ├── framework/              # Framework laptop (host package)
 │   └── .config/
@@ -97,7 +145,8 @@ dotfiles/
 │       ├── wluma/config.toml   # Auto-brightness (ambient light sensor)
 │       ├── waybar/host.jsonc   # modules-right incl. battery/backlight/VPN
 │       ├── color-calibration/  # ICC profile
-│       └── easyeffects/        # Audio preset
+│       ├── easyeffects/        # Audio preset
+│       └── zsh/aliases/        # Thermal profile aliases
 │
 ├── cosmo/                  # Desktop (host package)
 │   └── .config/
@@ -108,16 +157,15 @@ dotfiles/
 │   ├── .zprofile           # Homebrew shellenv + nvm
 │   └── .config/
 │       ├── aerospace/      # Tiling WM
-│       ├── alacritty/      # OS-specific window settings (os.toml)
+│       ├── alacritty/      # Terminal (base config, a copy of desktop's, + os.toml)
 │       ├── kanata/         # Keyboard remapper (home row mods)
-│       ├── btop/           # System monitor (config + bundled theme)
 │       ├── git/            # Global gitignore
 │       ├── posting/        # HTTP client (TUI)
-│       └── zsh/            # macOS aliases + zshrc.local
+│       └── zsh/            # rc.d/10-macos.zsh, aws + kubernetes aliases, kubectl/argo completion
 │
 ├── scripts/                # Installation tools
 │   ├── install.sh          # Bootstrap script
-│   └── packages/           # Package lists (base.txt, linux.txt, macos.txt)
+│   └── packages/           # Package lists per stow package (common, dev, desktop, macos)
 │
 ├── Makefile                # stow/unstow/update commands
 └── README.md               # This file
@@ -125,16 +173,19 @@ dotfiles/
 
 ## Requirements
 
-### All Platforms
-- Git
-- [GNU Stow](https://www.gnu.org/software/stow/)
-- Zsh
-- Neovim 0.10+ (0.11+ recommended for native LSP config)
-- [fzf](https://github.com/junegunn/fzf)
-- [ripgrep](https://github.com/BurntSushi/ripgrep)
-- [fd](https://github.com/sharkdp/fd) (used by the fzf project-jump widget, `^g`)
-- [eza](https://github.com/eza-community/eza) (modern `ls`)
-- [zellij](https://github.com/zellij-org/zellij) (terminal multiplexer)
+### common (every machine)
+- Git, [GNU Stow](https://www.gnu.org/software/stow/), Zsh — all it needs
+- Used when installed: Neovim 0.10+ (Debian 13's is fine without dev),
+  [fzf](https://github.com/junegunn/fzf) 0.48+ (key bindings, fzf-tab),
+  [eza](https://github.com/eza-community/eza) (fzf-tab's cd preview)
+
+### dev
+- Neovim 0.11+ (native LSP config, nvim-treesitter's `main` branch). Debian 13
+  ships 0.10.4, so install a release build there (debbie: `~/.local/bin/nvim`)
+- [ripgrep](https://github.com/BurntSushi/ripgrep) (Telescope)
+- [fd](https://github.com/sharkdp/fd) (Telescope, the `^g` project jump; `fd-find` on Debian)
+- [zellij](https://github.com/zellij-org/zellij) (terminal multiplexer; not packaged in Debian 13)
+- A C compiler and `tree-sitter-cli` for nvim-treesitter's parsers
 
 ### Linux (Hyprland)
 - Hyprland, Waybar, Wofi
@@ -169,34 +220,50 @@ To add a machine, create `<host>/.config/hypr/host.lua` and
 
 ## Shell environment
 
-- `PROJECTS_DIR` — base directory the `^g` fzf project-jump widget searches (defaults to `~/Documents/source`). Set it per-machine in the OS `zshrc.local` if your projects live elsewhere.
-- `PI_CODING_AGENT_DIR` — pi's config dir, `~/.config/pi/agent` on every machine. Set in `common/.zshenv` (every zsh, scripts included) and in Hyprland's `core/env.lua` for GUI launches; pi falls back to `~/.pi/agent` wherever it is unset (see below).
+Each package adds its zsh settings as drop-in files named `NN-<package>.zsh`,
+loaded in layer order (10 OS, 20 dev, 30 desktop, 40 window manager, 50 host):
+
+- `~/.config/zsh/env.d/` — sourced by `.zshenv`, so every zsh gets it (scripts
+  too). Only for variables that processes outside an interactive shell need.
+- `~/.config/zsh/rc.d/` — sourced at the end of `zshrc`.
+- `~/.config/zsh/aliases/` — every file there is sourced; a package adds its
+  own `<name>.aliases.sh`.
+- `~/.config/zsh/zshrc.local` — machine-local, untracked (`.gitignore`),
+  sourced last.
+
+Variables:
+
+- `PROJECTS_DIR` — base directory the `^g` fzf project-jump widget (dev) searches (defaults to `~/Documents/source`). Set it per machine in `~/.config/zsh/zshrc.local` if your projects live elsewhere (macOS sets it in `rc.d/10-macos.zsh`).
+- `PI_CODING_AGENT_DIR` — pi's config dir, `~/.config/pi/agent` on every machine. Set in dev's `env.d/20-dev.zsh` (every zsh, scripts included) and in Hyprland's `core/env.lua` for GUI launches; pi falls back to `~/.pi/agent` wherever it is unset (see below).
+- `SSH_AUTH_SOCK` — the Linux desktops' runit ssh-agent socket, set in desktop's `env.d/30-desktop.zsh`. Servers don't set it, so agent forwarding over SSH works there.
 
 ## pi coding agent
 
-`common` carries [pi](https://pi.dev)'s config: `settings.json` (preferences and
+`dev` carries [pi](https://pi.dev)'s config: `settings.json` (preferences and
 the pi packages it installs at startup), the `gruvbox-pastel` theme and the
 `context-footer` extension (the status bar at the bottom). It lives in
 `~/.config/pi/agent` instead of pi's default `~/.pi/agent`; nothing of pi's is
 kept in `~` itself. pi only honours `PI_CODING_AGENT_DIR` for that, so the
-variable is exported from `~/.zshenv` and the Hyprland environment. A pi started
+variable is exported from `~/.zshenv` (dev's `env.d`) and the Hyprland environment. A pi started
 without it silently creates a fresh `~/.pi/agent`; if one appears, rerun
 `scripts/migrate-pi.sh` after closing pi.
 
 pi keeps its credentials (`auth.json`), sessions, its own install and caches in
 the same directory. This repo is public, so `.gitignore` ignores everything
-under `common/.config/pi/agent` except the tracked config. pi writes
+under `dev/.config/pi/agent` except the tracked config. pi writes
 `settings.json` in place, so `/settings`, `pi install` and a new default model
 show up as changes here.
 
-- **New machine**: `~/.config/pi/agent` has to exist before `common` is stowed,
+- **New machine**: `~/.config/pi/agent` has to exist before `dev` is stowed,
   or stow turns `~/.config/pi` into a link to the repo and pi's credentials and
   sessions end up in the worktree. `make stow` and `install.sh` create it; with
-  plain stow, `mkdir -p ~/.config/pi/agent` first. Then open a new shell and
+  plain stow, `mkdir -p ~/.config/pi/agent/extensions` first (a real
+  `extensions` dir, so extensions other tools install, like herdr's, stay out
+  of the repo). Then open a new shell and
   install pi (the installer follows `PI_CODING_AGENT_DIR`).
 - **Machine still on `~/.pi/agent`**, or macOS (already on `~/.config/pi/agent`):
-  close pi and run `scripts/migrate-pi.sh` right after pulling and restowing
-  `common`. It moves the directory, re-points `~/.local/bin/pi` and links the
+  close pi and run `scripts/migrate-pi.sh` right after pulling and stowing
+  `common` and `dev`. It moves the directory, re-points `~/.local/bin/pi` and links the
   tracked files. Copies that differed from the repo replace the repo's, so
   `git diff` shows them. Restart Hyprland (or any shell older than the stow)
   before starting pi there, so it has the variable.
@@ -206,9 +273,9 @@ show up as changes here.
 ```bash
 make help                                  # Show available commands
 make install                               # Run bootstrap script
-make stow PACKAGES='common linux'          # Stow specified packages
-make restow PACKAGES='common linux'        # Restow after a pull (prunes links to deleted files)
-make unstow PACKAGES='common linux'        # Unstow specified packages
+make stow PACKAGES='common dev'            # Stow specified packages
+make restow PACKAGES='common dev'          # Restow after a pull (prunes links to deleted files)
+make unstow PACKAGES='common dev'          # Unstow specified packages
 make update                                # Update git submodules and nvim plugins
 ```
 
@@ -238,7 +305,8 @@ git config --global user.email "you@example.com"
 
 - [Neovim Configuration](common/.config/nvim/README.md) - Plugins, LSP, keybindings
 - [Zsh Configuration](common/.config/zsh/README.md) - Aliases, plugins, keybindings
-- [Linux Package](linux/README.md) - Kanata, Dunst, Ranger, scripts
+- [Dev Package](dev/README.md) - What dev adds, Ranger
+- [Desktop Package](desktop/README.md) - Kanata, Dunst, runit, scripts
 - [Hyprland Package](hyprland/README.md) - Keybindings, Waybar, Wofi
 - [dwm Package](dwm/README.md) - .xinitrc, Picom, dependencies
 - [Scripts](scripts/README.md) - install.sh, Makefile, package lists

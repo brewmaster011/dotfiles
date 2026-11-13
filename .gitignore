@@ -2,7 +2,7 @@
 # ABOUTME: Excludes runtime files, caches, and auto-generated configs
 
 # Runit runtime files
-linux/.config/runit/**/supervise/
+desktop/.config/runit/**/supervise/
 
 # Common runtime/temporary files
 *.log
@@ -19,22 +19,28 @@ hyprland/.config/hypr/monitors.conf
 hyprland/.config/hypr/workspaces.conf
 
 # Neovim plugin state (managed by lazy.nvim)
-common/.config/nvim/plugin/packer_compiled.lua
+dev/.config/nvim/plugin/packer_compiled.lua
 
-# pi coding agent: common/.config/pi/agent is stowed into ~/.config/pi/agent,
+# pi coding agent: dev/.config/pi/agent is stowed into ~/.config/pi/agent,
 # where pi also keeps its credentials (auth.json), sessions, its own install and
 # caches. This repo is public, so everything there is ignored except the config
 # listed here; add a line to track something new.
-common/.config/pi/*
-!common/.config/pi/agent/
-common/.config/pi/agent/*
-!common/.config/pi/agent/settings.json
-!common/.config/pi/agent/extensions/
-!common/.config/pi/agent/themes/
-common/.config/pi/agent/extensions/**/node_modules/
+dev/.config/pi/*
+!dev/.config/pi/agent/
+dev/.config/pi/agent/*
+!dev/.config/pi/agent/settings.json
+!dev/.config/pi/agent/extensions/
+dev/.config/pi/agent/extensions/*
+!dev/.config/pi/agent/extensions/context-footer/
+!dev/.config/pi/agent/themes/
+dev/.config/pi/agent/extensions/**/node_modules/
 
 # pi's project-local state when it runs in this repo (subagent task dirs etc.)
 /.pi/
+
+# Machine-local zsh settings (sourced last by zshrc). On a machine that only
+# stows common, ~/.config/zsh is a link into common, so this lands in the repo.
+*/.config/zsh/zshrc.local
 
 # Secrets (add your secret files here)
 # .env

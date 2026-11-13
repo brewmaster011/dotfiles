@@ -7,25 +7,25 @@ case "$(uname -s)" in
     Darwin*) export OS_TYPE="macos";;
 esac
 
-# OS-specific settings
+# This file is all a server gets (only common stowed), so it may only depend
+# on zsh and git: everything else is used only when it's installed.
+
+# Homebrew path (Apple Silicon); macOS uses Keychain for SSH. The Linux
+# desktops' ssh-agent socket is set by desktop (env.d).
 if [[ "$OS_TYPE" == "macos" ]]; then
-    # Homebrew path (Apple Silicon)
     eval "$(/opt/homebrew/bin/brew shellenv)" 2>/dev/null
-    # macOS uses Keychain for SSH - no custom socket needed
-else
-    # Linux SSH agent socket (managed by runit service)
-    export SSH_AUTH_SOCK="$HOME/.ssh/ssh_auth_sock"
 fi
+
+# ~/.local/bin: pipx/uv user installs, and nvim where it isn't packaged new
+# enough. First, so the checks for optional tools below see it.
+typeset -U path PATH   # no duplicates, also when a layer assigns PATH
+path=("$HOME/.local/bin" $path)
 
 setopt PROMPT_SUBST
 
-# Auto-start X on Linux TTY1 (for dwm)
-if [[ "$OS_TYPE" == "linux" ]] && [ -z "${DISPLAY}" ] && [ "${XDG_VTNR}" -eq 1 ]; then
-  exec startx
-fi
-
-
-export EDITOR=nvim
+# The first editor that's installed (a bare server may only have vi)
+for EDITOR in nvim vim vi; do (( $+commands[$EDITOR] )) && break; done
+export EDITOR
 
 # Enable colors and change prompt:
 autoload -U colors && colors	# Load colors
@@ -40,6 +40,7 @@ setopt interactive_comments
 HISTSIZE=10000000
 SAVEHIST=10000000
 HISTFILE=~/.cache/zsh/history
+[[ -d ~/.cache/zsh ]] || mkdir -p ~/.cache/zsh
 
 for file in $(ls -p ~/.config/zsh/aliases | grep -v /); do
 	source ~/.config/zsh/aliases/$file
@@ -92,10 +93,14 @@ preexec() { echo -ne '\e[5 q' ;} # Use beam shape cursor for each new prompt.
 autoload edit-command-line; zle -N edit-command-line
 bindkey '^e' edit-command-line
 
-# Load zsh plugins (managed as git submodules)
-source "$HOME/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh"
-source "$HOME/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-source "$HOME/.config/zsh/kubectl_autocomplete"
+# Load zsh plugins (managed as git submodules; missing if the repo was cloned
+# without --recursive). fzf-tab needs fzf itself.
+if (( $+commands[fzf] )) && [[ -r ~/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh ]]; then
+    source ~/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh
+fi
+if [[ -r ~/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+    source ~/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
 
 # disable sort when completing `git checkout`
 zstyle ':completion:*:git-checkout:*' sort false
@@ -104,12 +109,16 @@ zstyle ':completion:*:descriptions' format '[%d]'
 # set list-colors to enable filename colorizing
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 # preview directory's content with eza when completing cd
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
+# (decided when the preview runs: eza may come from a PATH a later layer adds)
+zstyle ':fzf-tab:complete:cd:*' fzf-preview \
+    'if command -v eza >/dev/null; then eza -1 --color=always $realpath; else ls -1 --color=always $realpath; fi'
 # switch group using `,` and `.`
 zstyle ':fzf-tab:*' switch-group ',' '.'
 # extra configuration for fzf-tab
 zstyle ':fzf-tab:*' continous-trigger '/'
 zstyle ':fzf-tab:*' fzf-pad 4
+# systemd service preview (Linux)
+zstyle ':fzf-tab:complete:systemctl-*:*' fzf-preview 'SYSTEMD_COLORS=1 systemctl status $word'
 
 # arrows search history
 autoload -U up-line-or-beginning-search
@@ -128,57 +137,23 @@ bindkey -s '^a' '^ubc -lq\n'
 # Notes shortcut
 bindkey -s '^n' '^unotes\n'
 
-# cd Fuzzy Finder
-bindkey -s '^f' '^ucd "$(dirname "$(fzf)")"\n'
+# cd Fuzzy Finder (needs fzf)
+(( $+commands[fzf] )) && bindkey -s '^f' '^ucd "$(dirname "$(fzf)")"\n'
 
-# fzf_cd: fuzzy find a project directory, then pick a git worktree if available
-fzf_cd() {
-
-  local repo wt_list wt
-
-  repo=$(
-    fd --type d --max-depth 1 '' "${PROJECTS_DIR:-$HOME/Documents/source}" \
-      | fzf --prompt "Select Directory"
-  )
-
-  if [[ -z $repo ]]; then
-      zle reset-prompt
-      return 1
-  fi
-
-  wt_list=(
-    ${(f)"$(git -C "${repo}" worktree list --porcelain 2>/dev/null)"}
-  )
-
-  if (( ${#wt_list[@]} )); then
-    wt=$(
-      printf "%s\n" "${wt_list[@]}" \
-        | awk '/^worktree / { print $2 }' \
-        | fzf --prompt="Select Worktree (esc = master/main)> "
-    )
-  fi
-
-  if [[ -n $wt ]]; then
-    cd -- "$wt"
-  else
-    cd -- "$repo"
-    cd main 2>/dev/null || cd master 2>/dev/null || true
-  fi
-
-  zle reset-prompt
-  return 0
-}
-
-zle -N fzf_cd
-bindkey '^g' fzf_cd
-
-# ~/.local/bin: pipx/uv user installs (both Linux and macOS)
-export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$HOME/.cache/dotnet:$HOME/.cache/dotnet/tools:$PATH"
-export DOTNET_ROOT="$HOME/.cache/dotnet"
 export FZF_DEFAULT_OPTS='--height 30% --layout=reverse --border'
 export ZSH_COMPDUMP="$HOME/.cache/zsh/zcompdump"
 
-eval "$(fzf --zsh)"
+# fzf's key bindings and completion (fzf 0.48+; older ones lack --zsh)
+if (( $+commands[fzf] )) && _fzf_zsh="$(fzf --zsh 2>/dev/null)"; then
+    eval "$_fzf_zsh"
+fi
+unset _fzf_zsh
 
-# Source OS-specific settings
+# The other stow packages (macos, dev, desktop, a WM, a host) each drop a file
+# in rc.d, named NN-<package>.zsh so they load in layer order: 10 OS, 20 dev,
+# 30 desktop, 40 window manager, 50 host.
+for f in ~/.config/zsh/rc.d/*.zsh(N); do source "$f"; done
+unset f
+
+# Machine-local settings, never tracked (.gitignore), e.g. PROJECTS_DIR
 [[ -f ~/.config/zsh/zshrc.local ]] && source ~/.config/zsh/zshrc.local

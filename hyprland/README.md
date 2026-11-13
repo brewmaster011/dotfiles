@@ -70,7 +70,7 @@ These services start automatically with Hyprland:
 - `hypridle` - Idle manager
 - `hyprsunset` - Blue-light filter (neutral by default) and hypridle's screen blanking
 - `hyprpolkitagent` - Polkit authentication
-- `runsvdir` - User runit services (see `linux/` package)
+- `runsvdir` - User runit services (see the `desktop/` package)
 - SSH agent, loading every key in `~/.ssh`
 
 ## Default Applications

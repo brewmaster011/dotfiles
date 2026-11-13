@@ -1,4 +1,4 @@
-# macOS-specific zshrc settings
+# macOS-specific zshrc settings (sourced from rc.d by common's zshrc)
 
 # uv/uvx - Python package manager PATH
 [[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
@@ -8,6 +8,9 @@ export PATH="$HOME/.aspire/bin:$PATH"
 
 # Project directory for the ^g fzf project-jump widget
 export PROJECTS_DIR="$HOME/Documents/src"
+
+# kubectl completion
+source ~/.config/zsh/kubectl_autocomplete
 
 # Argo CLI completion
 [[ -f ~/.config/zsh/argo_autocomplete ]] && source ~/.config/zsh/argo_autocomplete

@@ -2,15 +2,29 @@
 
 Minimal, hand-built Neovim configuration using Lua. No pre-configured "IDE distributions" - just the plugins and settings needed.
 
-**Requires:** Neovim 0.10+ (0.11+ recommended for native `vim.lsp.config`)
+## Two halves: common and dev
+
+The config is split across two stow packages, so a server gets the same
+options and keymaps without anything it can't run:
+
+| | `common` (every machine) | `+ dev` (machines you work on) |
+|-|--------------------------|--------------------------------|
+| Files | `init.lua`, `lua/base/` (options, keymaps) | `lua/dev/` (lazy.nvim + plugin list), `after/plugin/`, `lua/lsp/`, `lazy-lock.json` |
+| Plugins | none, nothing fetched at startup | everything below |
+| Colours | built-in `retrobox` (gruvbox-like) | `gruvbox` |
+| `<leader>b` | netrw (`:Lexplore`) | nvim-tree |
+| Requires | Neovim 0.10+ (Debian 13's 0.10.4 is fine) | Neovim 0.11+ (native `vim.lsp.config`) |
+
+`init.lua` loads `lua/dev` only when it exists, i.e. when dev is stowed.
+Plugin-only keymaps (Telescope, LSP, completion, git) exist with dev only.
 
 ## Quick Start
 
-On first launch, lazy.nvim will auto-bootstrap and install all plugins. Then run `:Mason` to install LSP servers.
+With dev: on first launch, lazy.nvim will auto-bootstrap and install all plugins. Then run `:Mason` to install LSP servers.
 
 ## Plugin Manager
 
-Uses [lazy.nvim](https://github.com/folke/lazy.nvim) for plugin management. Plugins are defined in `lua/base/lazy.lua`.
+Uses [lazy.nvim](https://github.com/folke/lazy.nvim) for plugin management (dev). Plugins are defined in `lua/dev/lazy.lua`.
 
 ## Plugins
 
@@ -58,7 +72,7 @@ Managed via Mason. Configured in `after/plugin/lsp.lua` with custom settings in 
 
 | Key | Mode | Action |
 |-----|------|--------|
-| `<leader>b` | Normal | Toggle file tree (NvimTree) |
+| `<leader>b` | Normal | Toggle file tree (NvimTree with dev, netrw without) |
 | `<leader>n` | Normal | Clear search highlighting |
 | `<leader>jq` | Normal | Format buffer as JSON (via jq) |
 | `<leader>y` | Normal/Visual | Yank to system clipboard |
@@ -153,22 +167,23 @@ Within a Telescope picker, `Ctrl+q` sends all results to quickfix and `Alt+q` se
 
 ```
 nvim/
-├── init.lua                    # Entry point, loads base, sets colorscheme
-├── lazy-lock.json              # Plugin version lockfile
+├── init.lua                    # Entry point: remap, set, then lua/dev or retrobox   (common)
+├── lazy-lock.json              # Plugin version lockfile                             (dev)
 ├── lua/
-│   ├── base/
-│   │   ├── init.lua            # Loads remap, set, lazy; configures nvim-tree
-│   │   ├── lazy.lua            # Plugin definitions
+│   ├── base/                                                                         (common)
 │   │   ├── set.lua             # vim.opt settings
 │   │   └── remap.lua           # Global keymaps
-│   └── lsp/
+│   ├── dev/                                                                          (dev)
+│   │   ├── init.lua            # Loads lazy; configures nvim-tree, gruvbox
+│   │   └── lazy.lua            # Plugin definitions
+│   └── lsp/                                                                          (dev)
 │       ├── init.lua            # Shared LSP capabilities
 │       ├── lua_ls.lua          # Lua LSP config
 │       ├── pylsp.lua           # Python LSP config
 │       ├── csharp_ls.lua       # C# LSP config
 │       ├── ltex.lua            # LaTeX LSP config
 │       └── cucumber_language_server.lua
-└── after/plugin/
+└── after/plugin/                                                                    (dev)
     ├── lsp.lua                 # Mason setup, LspAttach keymaps
     ├── cmp.lua                 # Completion config
     ├── telescope.lua           # Telescope keymaps

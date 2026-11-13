@@ -1,0 +1,8 @@
+# ABOUTME: Packages for common, which every machine stows (servers too)
+# ABOUTME: zsh and git are all it needs; the rest is used when it's installed
+
+git
+stow
+zsh
+neovim
+fzf

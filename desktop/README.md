@@ -1,17 +1,24 @@
-# Linux Package
+# Desktop Package
 
-Linux-specific configurations for desktop systems. Includes keyboard remapping, notifications, file manager, and system services.
+The Linux desktop layer, shared by `hyprland` and `dwm`: terminal, keyboard
+remapping, notifications, audio, the ssh-agent service and statusbar scripts.
+Stowed on top of `common` and `dev`, below a window manager and a host package:
+
+```bash
+make stow PACKAGES='common dev desktop hyprland cosmo'
+```
 
 ## Contents
 
 | Directory | Description |
 |-----------|-------------|
+| `alacritty/` | Terminal: base config + Linux window settings (`os.toml`) |
 | `dunst/` | Notification daemon |
 | `kanata/` | Keyboard remapper (home row mods) |
-| `ranger/` | Terminal file manager |
-| `neofetch/` | System info display |
+| `pipewire/` | Starts wireplumber and pipewire-pulse (no systemd) |
 | `runit/` | User services (SSH agent) |
 | `scripts/` | Statusbar scripts, playerctl hooks |
+| `zsh/` | `SSH_AUTH_SOCK` (`env.d`), `MOZ_USE_XINPUT2` (`rc.d`), WireGuard/Spotify/wifipass aliases |
 
 ## Kanata (Keyboard Remapper)
 
@@ -62,42 +69,6 @@ Notification daemon with:
 - 2x scaling for HiDPI
 - Gruvbox-inspired colors
 
-## Ranger (File Manager)
-
-Terminal file manager with vim-like keybindings.
-
-### Key Ranger Bindings
-
-| Key | Action |
-|-----|--------|
-| `h/j/k/l` | Navigate (vim-style) |
-| `gg` / `G` | Top / Bottom |
-| `H` / `L` | History back / forward |
-| `Space` | Mark file |
-| `yy` | Copy (yank) |
-| `dd` | Cut |
-| `pp` | Paste |
-| `dD` | Delete |
-| `cw` | Rename |
-| `/` | Search |
-| `n` / `N` | Next / Previous match |
-| `zh` | Toggle hidden files |
-| `zp` | Toggle preview |
-
-### Directory Shortcuts
-
-| Key | Directory |
-|-----|-----------|
-| `gh` | Home (`~`) |
-| `ge` | `/etc` |
-| `gu` | `/usr` |
-| `gd` | `/dev` |
-| `go` | `/opt` |
-| `gm` | `/media` |
-| `gr` | `/` (root) |
-
-See `rc.conf` for the full list of keybindings.
-
 ## Runit Services
 
 User-level runit services in `runit/sv/`:
@@ -105,6 +76,8 @@ User-level runit services in `runit/sv/`:
 ### SSH Agent
 
 Manages SSH agent with a predictable socket path at `~/.ssh/ssh_auth_sock`.
+`zsh/env.d/30-desktop.zsh` points `SSH_AUTH_SOCK` there for every zsh
+(Hyprland's `core/env.lua` does the same for GUI launches).
 
 ```bash
 # The service is started via runsvdir in .xinitrc or hyprland.conf
@@ -132,7 +105,5 @@ Scripts for dwm status bar (dwmblocks):
 |------|----------------|---------|
 | dunst | `dunst` | Notifications |
 | kanata | `kanata` (AUR) | Keyboard remapper |
-| ranger | `ranger` | File manager |
-| neofetch | `neofetch` | System info |
 | runit | `runit` | Service manager |
 | playerctl | `playerctl` | Media controls |

@@ -9,7 +9,7 @@ hl.env("SSH_ASKPASS_REQUIRE", "prefer")
 
 hl.env("GRIM_DEFAULT_DIR", HOME .. "/Pictures/screenshots")
 
--- pi coding agent dir (also in common/.zshenv); for launches that bypass zsh
+-- pi coding agent dir (also in dev's zsh env.d); for launches that bypass zsh
 hl.env("PI_CODING_AGENT_DIR", HOME .. "/.config/pi/agent")
 
 -- GTK Theme

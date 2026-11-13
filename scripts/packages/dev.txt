@@ -1,0 +1,9 @@
+# ABOUTME: Packages for dev (machines you work on)
+# ABOUTME: Names as in Homebrew/Arch; install.sh maps them for apt
+
+ripgrep
+fd
+eza
+zellij
+ranger
+neofetch
