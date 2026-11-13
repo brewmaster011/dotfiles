@@ -1,8 +1,8 @@
 -- Keyboard Remaps
 vim.g.mapleader = " "
 
--- File tree
-vim.keymap.set("n", "<leader>b", vim.cmd.NvimTreeToggle, { desc = "Toggle file tree" })
+-- File tree: netrw here, nvim-tree where dev is stowed (lua/dev/init.lua)
+vim.keymap.set("n", "<leader>b", vim.cmd.Lexplore, { desc = "Toggle file tree" })
 
 -- Move between splits
 vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Focus left split" })
