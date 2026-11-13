@@ -70,6 +70,12 @@ elif [[ "$OS_TYPE" == "macos" ]]; then
     if ! command -v brew &>/dev/null; then
         echo "Installing Homebrew..."
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        # The installer doesn't put brew on this shell's PATH
+        if [[ -x /opt/homebrew/bin/brew ]]; then
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+        elif [[ -x /usr/local/bin/brew ]]; then
+            eval "$(/usr/local/bin/brew shellenv)"
+        fi
     fi
     # One at a time: a formula Homebrew has disabled (e.g. neofetch) must not
     # stop the rest, or the submodules and stow below

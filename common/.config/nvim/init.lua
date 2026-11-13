@@ -15,8 +15,10 @@ if has_dev and vim.fn.has("nvim-0.11") == 1 then
     require("dev")
 else
     if has_dev then
-        vim.notify("nvim " .. tostring(vim.version()) .. " is too old for dev's plugins (0.11+), loaded without them",
-            vim.log.levels.WARN)
+        -- after startup and short, so it never needs a hit-enter
+        vim.schedule(function()
+            vim.notify("dev's plugins need nvim 0.11+: loaded without them", vim.log.levels.WARN)
+        end)
     end
     vim.cmd.colorscheme("retrobox")
 end

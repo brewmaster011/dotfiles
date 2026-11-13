@@ -73,13 +73,17 @@ loses its config mid-session.
    worktree.
 2. Before pulling, unstow the packages that move:
    `make unstow PACKAGES='common linux'` (Mac: `'common macos'`)
-3. Pull (or switch the worktree to the new branch), then delete the leftover
-   `linux/` dir: git leaves it behind with runit's ignored `supervise/` files.
+3. Pull (or switch the worktree to the new branch), then look for files git
+   left behind in the old dirs: `git status --short --ignored common linux macos`.
+   `linux/` stays with runit's ignored `supervise/` files; delete it. Anything
+   under `common/.config/pi/` is something a tool installed into a folded pi
+   dir (e.g. an extension): move it to `~/.config/pi/agent/` after step 4.
+   Delete what's left.
 4. Stow the new layers next to the ones still stowed:
    `make stow PACKAGES='common dev desktop'` (Mac: `'common dev macos'`)
 5. Linux: runit's ssh-agent ran from the old `linux/` path and stops when that goes:
    log out and back in (or restart the user `runsvdir`), then load the keys
-   again (`~/.config/scripts/ssh-load-keys`).
+   again (`~/.config/scripts/ssh-load-keys` on Hyprland, or `ssh-add`).
 6. The tracked `zshrc.local` files of `linux` and `macos` became `rc.d` files;
    `~/.config/zsh/zshrc.local` is now untracked and yours, for machine-local
    settings (see "Shell environment").
