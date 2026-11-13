@@ -3,7 +3,9 @@
 
 require("dev.lazy")
 
--- disable netrw (nvim-tree replaces it); still before the plugin/ scripts load
+-- nvim-tree advises disabling netrw before anything loads; by now lazy.nvim's
+-- setup has already sourced the runtime plugins, so these only stop netrw from
+-- loading again (unchanged from before; moving them up would change behaviour)
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 

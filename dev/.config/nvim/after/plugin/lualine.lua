@@ -1,6 +1,8 @@
 -- ABOUTME: Lualine status line configuration
 -- ABOUTME: Gruvbox theme with git, diagnostics, LSP status, and clock
 
+if not package.loaded.lazy then return end -- plugins not loaded: nvim older than 0.11 (init.lua)
+
 local config = {
     options = {
         theme = 'gruvbox',

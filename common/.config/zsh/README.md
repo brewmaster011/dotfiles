@@ -28,6 +28,9 @@ loaded in layer order (10 OS, 20 dev, 30 desktop, 40 window manager, 50 host):
 
 `~/.config/zsh/zshrc.local` is machine-local and untracked, sourced last.
 
+`rc.d` runs after `compinit`, so adding to `fpath` there has no effect on
+completion; source the completion script instead (as macos does for kubectl).
+
 ## Plugins
 
 Plugins are managed as git submodules in `plugins/`:

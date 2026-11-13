@@ -12,8 +12,9 @@ cd ~/dotfiles
 # Run the bootstrap script (installs packages, initializes submodules, runs stow)
 ./scripts/install.sh
 
-# Or stow the packages yourself (with dev: pi's dir first, see "pi coding agent")
-mkdir -p ~/.config/pi/agent
+# Or stow the packages yourself. The dirs first, or stow links them into the
+# repo: ~/.config always, pi's dirs with dev (see "pi coding agent")
+mkdir -p ~/.config/pi/agent/extensions
 stow common dev desktop hyprland cosmo -t ~
 ```
 
@@ -57,12 +58,31 @@ make stow PACKAGES='common dev desktop dwm'
 make stow PACKAGES='common dev macos'
 ```
 
-Moving a machine from the old layout (`common linux ...`): unstow with the old
-list from the old checkout, pull, then stow the new list:
-`make unstow PACKAGES='common linux hyprland cosmo'`, `git pull`,
-`make stow PACKAGES='common dev desktop hyprland cosmo'`. A tracked
-`zshrc.local` is gone; machine-local settings go in an untracked
-`~/.config/zsh/zshrc.local` (see "Shell environment").
+`make stow`/`restow` and `install.sh` create `~/.config` first: a new server
+user has none, and stowing `common` alone would otherwise link all of
+`~/.config` into this public repo. With plain stow, `mkdir -p ~/.config` first.
+
+### Moving a machine from the old layout (`common linux ...`)
+
+Only `common` and the OS package (`linux`, or `macos` on the Mac) changed
+shape; the window manager and host packages stay stowed, so Hyprland never
+loses its config mid-session.
+
+1. Close every pi (its config links are in the old `common`), and commit or
+   stash anything uncommitted under `common/`, `linux/` or `macos/` in the
+   worktree.
+2. Before pulling, unstow the packages that move:
+   `make unstow PACKAGES='common linux'` (Mac: `'common macos'`)
+3. Pull (or switch the worktree to the new branch), then delete the leftover
+   `linux/` dir: git leaves it behind with runit's ignored `supervise/` files.
+4. Stow the new layers next to the ones still stowed:
+   `make stow PACKAGES='common dev desktop'` (Mac: `'common dev macos'`)
+5. Linux: runit's ssh-agent ran from the old `linux/` path and stops when that goes:
+   log out and back in (or restart the user `runsvdir`), then load the keys
+   again (`~/.config/scripts/ssh-load-keys`).
+6. The tracked `zshrc.local` files of `linux` and `macos` became `rc.d` files;
+   `~/.config/zsh/zshrc.local` is now untracked and yours, for machine-local
+   settings (see "Shell environment").
 
 ## Directory Structure
 
@@ -231,7 +251,9 @@ show up as changes here.
 - **New machine**: `~/.config/pi/agent` has to exist before `dev` is stowed,
   or stow turns `~/.config/pi` into a link to the repo and pi's credentials and
   sessions end up in the worktree. `make stow` and `install.sh` create it; with
-  plain stow, `mkdir -p ~/.config/pi/agent` first. Then open a new shell and
+  plain stow, `mkdir -p ~/.config/pi/agent/extensions` first (a real
+  `extensions` dir, so extensions other tools install, like herdr's, stay out
+  of the repo). Then open a new shell and
   install pi (the installer follows `PI_CODING_AGENT_DIR`).
 - **Machine still on `~/.pi/agent`**, or macOS (already on `~/.config/pi/agent`):
   close pi and run `scripts/migrate-pi.sh` right after pulling and stowing

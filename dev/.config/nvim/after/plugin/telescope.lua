@@ -1,6 +1,8 @@
 -- ABOUTME: Telescope keymaps for fuzzy finding files, grep, and LSP references
 -- ABOUTME: Ctrl+p for files, Ctrl+f for grep, leader+fr for references
 
+if not package.loaded.lazy then return end -- plugins not loaded: nvim older than 0.11 (init.lua)
+
 local builtin = require('telescope.builtin')
 
 -- find_files with hidden files shown (for dotfiles)

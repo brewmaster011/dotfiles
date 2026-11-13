@@ -30,7 +30,7 @@ if [[ -z "${PACKAGES:-}" ]]; then
     echo "  macos      - macOS (aerospace, alacritty, kanata, kubectl, shell profile)"
     echo "  hyprland   - Hyprland/Wayland (hypr, waybar, wofi, feh)"
     echo "  dwm        - X11/dwm (picom, xmodmap, .xinitrc, startx on TTY1)"
-    echo "  framework  - Framework laptop host (hypr host.lua, waybar, wluma, color-calibration, easyeffects)"
+    echo "  framework  - Framework laptop host (hypr host.lua, waybar, wluma, color-calibration, easyeffects, thermal aliases)"
     echo "  cosmo      - Desktop host (hypr host.lua, waybar, NVIDIA env)"
     echo ""
     if [[ "$OS_TYPE" == "macos" ]]; then
@@ -71,11 +71,27 @@ elif [[ "$OS_TYPE" == "macos" ]]; then
         echo "Installing Homebrew..."
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
-    echo "Installing: ${wanted[*]}"
-    brew install "${wanted[@]}"
+    # One at a time: a formula Homebrew has disabled (e.g. neofetch) must not
+    # stop the rest, or the submodules and stow below
+    failed=()
+    for name in "${wanted[@]}"; do
+        brew install "$name" || failed+=("$name")
+    done
+    (( ${#failed[@]} )) && echo "Could not install (continuing): ${failed[*]}"
 elif command -v pacman &>/dev/null; then
     echo "Detected Arch Linux (pacman)"
-    sudo pacman -S --needed "${wanted[@]}"
+    # Skip what isn't in the repos (AUR-only, e.g. kanata, or dropped)
+    pac_pkgs=()
+    for name in "${wanted[@]}"; do
+        if pacman -Si "$name" &>/dev/null; then
+            pac_pkgs+=("$name")
+        else
+            echo "Not in the pacman repos, skipped: $name"
+        fi
+    done
+    if (( ${#pac_pkgs[@]} )); then
+        sudo pacman -S --needed "${pac_pkgs[@]}"
+    fi
 elif command -v apt-get &>/dev/null; then
     echo "Detected Debian/Ubuntu (apt)"
     # Debian names (fd is fd-find); skip what the release doesn't package
@@ -105,9 +121,11 @@ git submodule update --init --recursive
 if [[ -n "$PACKAGES" ]]; then
     echo "Running: stow $PACKAGES -t ~"
     cd "$DOTFILES_DIR"
-    # pi's agent dir has to exist before dev is stowed (see the Makefile)
+    # Real dirs, so stow doesn't fold them into links to the repo (see the
+    # Makefile): ~/.config always, pi's agent and extensions dirs for dev
+    mkdir -p ~/.config
     if [[ " $PACKAGES " == *" dev "* ]]; then
-        mkdir -p ~/.config/pi/agent
+        mkdir -p ~/.config/pi/agent/extensions
     fi
     stow $PACKAGES -t ~
     echo ""

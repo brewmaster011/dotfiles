@@ -5,11 +5,15 @@
 
 STOW_TARGET := $(HOME)
 
-# pi's agent dir has to exist before dev is stowed: otherwise stow folds
-# ~/.config/pi into a link to this repo, and pi then writes its credentials,
-# sessions and install into the worktree (see "pi coding agent" in README.md)
+# Dirs that must be real before stowing, or stow folds them into one link to
+# this (public) repo and whatever tools write there lands in the worktree:
+# - ~/.config: a fresh server user has none, and common alone would fold it
+# - pi's agent dir (dev): pi writes its credentials, sessions and install there
+#   (see "pi coding agent" in README.md)
+# - its extensions dir: other tools install extensions there (herdr's
+#   integration), so only our extensions may be links
 PI_AGENT_DIR := $(STOW_TARGET)/.config/pi/agent
-make_pi_dir = $(if $(filter dev,$(PACKAGES)),@mkdir -p $(PI_AGENT_DIR))
+make_dirs = @mkdir -p $(STOW_TARGET)/.config $(if $(filter dev,$(PACKAGES)),$(PI_AGENT_DIR)/extensions)
 
 help:
 	@echo "Dotfiles Management"
@@ -28,7 +32,7 @@ help:
 	@echo "  macos      - macOS (aerospace, alacritty, kanata, kubectl, shell profile)"
 	@echo "  hyprland   - Hyprland/Wayland (hypr, waybar, wofi, feh)"
 	@echo "  dwm        - X11/dwm (picom, xmodmap, .xinitrc, startx on TTY1)"
-	@echo "  framework  - Framework laptop host (hypr host.lua, waybar, wluma, color-calibration, easyeffects)"
+	@echo "  framework  - Framework laptop host (hypr host.lua, waybar, wluma, color-calibration, easyeffects, thermal aliases)"
 	@echo "  cosmo      - Desktop host (hypr host.lua, waybar, NVIDIA env)"
 	@echo ""
 	@echo "Examples:"
@@ -45,7 +49,7 @@ stow:
 ifndef PACKAGES
 	$(error PACKAGES is required. Example: make stow PACKAGES='common dev')
 endif
-	$(make_pi_dir)
+	$(make_dirs)
 	stow $(PACKAGES) -t $(STOW_TARGET)
 
 # Unstow + stow: picks up new files and removes links to files deleted from a package
@@ -53,7 +57,7 @@ restow:
 ifndef PACKAGES
 	$(error PACKAGES is required. Example: make restow PACKAGES='common dev')
 endif
-	$(make_pi_dir)
+	$(make_dirs)
 	stow -R $(PACKAGES) -t $(STOW_TARGET)
 
 unstow:
@@ -64,4 +68,8 @@ endif
 
 update:
 	git submodule update --remote --merge
-	nvim --headless "+Lazy! sync" +qa 2>/dev/null || echo "Note: Lazy.nvim sync skipped (not yet migrated)"
+	@if [ -e "$(STOW_TARGET)/.config/nvim/lua/dev/init.lua" ]; then \
+		nvim --headless "+Lazy! sync" +qa; \
+	else \
+		echo "No nvim plugins to sync (dev isn't stowed)"; \
+	fi

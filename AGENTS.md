@@ -40,7 +40,7 @@ never commit credentials, tokens or other secrets.
 - `common` must start cleanly on a server with only zsh and git: guard any
   other tool (`(( $+commands[x] ))` in zsh, `command -v` in the `.sh` alias
   files), and don't make it fetch anything (nvim plugins live in dev). Check
-  with a throwaway HOME: `stow -t "$tmp" common`, then
+  with a throwaway HOME: `mkdir "$tmp/.config"; stow -t "$tmp" common`, then
   `env -i HOME="$tmp" PATH=/usr/bin:/bin TERM=xterm zsh -i -c exit`.
 - zsh settings for a package go in drop-ins named `NN-<package>.zsh`:
   `~/.config/zsh/env.d/` (from `.zshenv`, every zsh) or `rc.d/` (end of

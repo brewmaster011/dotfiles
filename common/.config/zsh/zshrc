@@ -109,11 +109,9 @@ zstyle ':completion:*:descriptions' format '[%d]'
 # set list-colors to enable filename colorizing
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 # preview directory's content with eza when completing cd
-if (( $+commands[eza] )); then
-    zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
-else
-    zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls -1 --color=always $realpath'
-fi
+# (decided when the preview runs: eza may come from a PATH a later layer adds)
+zstyle ':fzf-tab:complete:cd:*' fzf-preview \
+    'if command -v eza >/dev/null; then eza -1 --color=always $realpath; else ls -1 --color=always $realpath; fi'
 # switch group using `,` and `.`
 zstyle ':fzf-tab:*' switch-group ',' '.'
 # extra configuration for fzf-tab
@@ -139,8 +137,8 @@ bindkey -s '^a' '^ubc -lq\n'
 # Notes shortcut
 bindkey -s '^n' '^unotes\n'
 
-# cd Fuzzy Finder
-bindkey -s '^f' '^ucd "$(dirname "$(fzf)")"\n'
+# cd Fuzzy Finder (needs fzf)
+(( $+commands[fzf] )) && bindkey -s '^f' '^ucd "$(dirname "$(fzf)")"\n'
 
 export FZF_DEFAULT_OPTS='--height 30% --layout=reverse --border'
 export ZSH_COMPDUMP="$HOME/.cache/zsh/zcompdump"

@@ -30,6 +30,8 @@ dev/.config/pi/*
 dev/.config/pi/agent/*
 !dev/.config/pi/agent/settings.json
 !dev/.config/pi/agent/extensions/
+dev/.config/pi/agent/extensions/*
+!dev/.config/pi/agent/extensions/context-footer/
 !dev/.config/pi/agent/themes/
 dev/.config/pi/agent/extensions/**/node_modules/
 

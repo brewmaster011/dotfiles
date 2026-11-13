@@ -1,6 +1,8 @@
 -- ABOUTME: LSP setup using Mason, mason-lspconfig, and nvim-lspconfig
 -- ABOUTME: Uses automatic_enable for installed servers, keymaps via LspAttach autocmd
 
+if not package.loaded.lazy then return end -- plugins not loaded: nvim older than 0.11 (init.lua)
+
 -- Setup Mason first
 require("mason").setup()
 
