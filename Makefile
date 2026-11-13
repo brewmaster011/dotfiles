@@ -5,11 +5,11 @@
 
 STOW_TARGET := $(HOME)
 
-# pi's agent dir has to exist before common is stowed: otherwise stow folds
+# pi's agent dir has to exist before dev is stowed: otherwise stow folds
 # ~/.config/pi into a link to this repo, and pi then writes its credentials,
 # sessions and install into the worktree (see "pi coding agent" in README.md)
 PI_AGENT_DIR := $(STOW_TARGET)/.config/pi/agent
-make_pi_dir = $(if $(filter common,$(PACKAGES)),@mkdir -p $(PI_AGENT_DIR))
+make_pi_dir = $(if $(filter dev,$(PACKAGES)),@mkdir -p $(PI_AGENT_DIR))
 
 help:
 	@echo "Dotfiles Management"

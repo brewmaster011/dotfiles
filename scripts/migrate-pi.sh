@@ -1,12 +1,12 @@
 #!/bin/sh
 # ABOUTME: One-off move of pi's agent dir from ~/.pi/agent to ~/.config/pi/agent,
-# ABOUTME: then links the pi config tracked in common (settings, theme, extension)
+# ABOUTME: then links the pi config tracked in dev (settings, theme, extension)
 #
 # Close every pi session first: pi runs from its agent dir, so moving it under a
 # running pi breaks that session. Safe to run again; on a machine that already
 # uses ~/.config/pi/agent (macOS) it only links the tracked files. Stow common
-# first (or let it, below) so ~/.zshenv exports PI_CODING_AGENT_DIR: pi only
-# looks in ~/.config/pi/agent when that variable is set.
+# and dev first (dev is restowed below) so ~/.zshenv exports PI_CODING_AGENT_DIR
+# (dev's env.d): pi only looks in ~/.config/pi/agent when that variable is set.
 #
 # Usage: scripts/migrate-pi.sh
 
@@ -30,8 +30,9 @@ fi
 # 1. Move the whole agent dir: pi's install, sessions, credentials and config
 if [ -d "$old" ] && [ ! -L "$old" ]; then
     if [ -e "$new" ]; then
-        # Only links from an earlier stow of common may be there already
-        if [ -n "$(find "$new" ! -type d ! -lname '*/common/.config/pi/agent/*' | head -n 1)" ]; then
+        # Only links from an earlier stow may be there already (pi's config
+        # was in common before it moved to dev)
+        if [ -n "$(find "$new" ! -type d ! -lname '*/common/.config/pi/agent/*' ! -lname '*/dev/.config/pi/agent/*' | head -n 1)" ]; then
             echo "Both $old and $new have files; merge them by hand." >&2
             exit 1
         fi
@@ -67,8 +68,8 @@ esac
 #    stow --adopt), so git diff shows what this machine had.
 cd "$repo"
 differs=
-for f in $(git ls-files common/.config/pi/agent); do
-    target="$HOME/${f#common/}"
+for f in $(git ls-files dev/.config/pi/agent); do
+    target="$HOME/${f#dev/}"
     [ -f "$target" ] && [ ! -L "$target" ] || continue
     # Under a dir stow already linked, the "target" is the repo's own file
     case $(cd "$(dirname "$target")" && pwd -P)/ in
@@ -84,12 +85,12 @@ done
 
 # A real directory, so stow links inside it instead of folding ~/.config/pi
 mkdir -p "$new"
-if ! stow -R -t "$HOME" common; then
+if ! stow -R -t "$HOME" dev; then
     echo "stow failed (see above). Fix that and run this again; it picks up" >&2
     echo "where it stopped." >&2
     exit 1
 fi
-echo "Linked common's pi config into $new"
+echo "Linked dev's pi config into $new"
 
 if [ -n "$differs" ]; then
     echo "This machine's copies differed from the repo; review: git -C \"$repo\" diff"

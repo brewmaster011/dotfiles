@@ -87,8 +87,8 @@ fi
 if [[ -n "$PACKAGES" ]]; then
     echo "Running: stow $PACKAGES -t ~"
     cd "$DOTFILES_DIR"
-    # pi's agent dir has to exist before common is stowed (see the Makefile)
-    if [[ " $PACKAGES " == *" common "* ]]; then
+    # pi's agent dir has to exist before dev is stowed (see the Makefile)
+    if [[ " $PACKAGES " == *" dev "* ]]; then
         mkdir -p ~/.config/pi/agent
     fi
     stow $PACKAGES -t ~

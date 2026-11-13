@@ -5,12 +5,3 @@ export MOZ_USE_XINPUT2=1
 
 # fzf-tab: systemd service preview
 zstyle ':fzf-tab:complete:systemctl-*:*' fzf-preview 'SYSTEMD_COLORS=1 systemctl status $word'
-
-# opencode (installed via install script, not brew)
-export PATH="$HOME/.opencode/bin:$PATH"
-
-# Go (Linux manual install; macOS uses Homebrew's go)
-export PATH="/usr/local/go/bin:$PATH"
-
-# pipx/uv user installs
-export PATH="$HOME/.local/bin:$PATH"
