@@ -8,13 +8,17 @@ never commit credentials, tokens or other secrets.
 - A bare repo with worktrees (on cosmo `~/Documents/source/dotfiles.git/<branch>`).
   Each machine stows from one worktree, so its files *are* the live config:
   edits apply at once (Hyprland autoreloads, waybar reloads its CSS).
-- Stow packages are the top-level dirs: `common` (every machine), `linux`,
-  `macos`, `hyprland`, `dwm`, plus one host package per Hyprland machine.
-  `scripts/` is not stowed.
+- Stow packages are the top-level dirs, stacked as layers: `common` (every
+  machine, servers included), `dev` (machines you work on), `desktop` (Linux
+  GUI) or `macos`, a window manager (`hyprland`, `dwm`), then one host package
+  per Hyprland machine. A layer only adds to the ones below. `scripts/` is not
+  stowed.
 - Machines: cosmo, the desktop (Artix with runit, NVIDIA, OLED monitor):
-  `common linux hyprland cosmo`. Framework 13 laptop:
-  `common linux hyprland framework`. Mac: `common macos`. uConsole: on the
-  `feature/uconsole-support` branch.
+  `common dev desktop hyprland cosmo`. Framework 13 laptop:
+  `common dev desktop hyprland framework`. Mac: `common dev macos`. The
+  homelab servers (Debian, managed from the homelab repo; SSH for emergencies
+  only): `common`. The `agent` user on debbie: `common dev`. uConsole: on the
+  `feature/uconsole-support` branch (still on the old layout).
 
 ## Working here
 
@@ -33,5 +37,14 @@ never commit credentials, tokens or other secrets.
   the Hyprland source for the installed version. `window.float` takes `on`/`off`,
   `window.fullscreen` takes `set`/`unset`, and unknown values silently become
   `toggle`.
-- pi's config is `common/.config/pi/agent` (stowed to `~/.config/pi/agent`).
+- `common` must start cleanly on a server with only zsh and git: guard any
+  other tool (`(( $+commands[x] ))` in zsh, `command -v` in the `.sh` alias
+  files), and don't make it fetch anything (nvim plugins live in dev). Check
+  with a throwaway HOME: `stow -t "$tmp" common`, then
+  `env -i HOME="$tmp" PATH=/usr/bin:/bin TERM=xterm zsh -i -c exit`.
+- zsh settings for a package go in drop-ins named `NN-<package>.zsh`:
+  `~/.config/zsh/env.d/` (from `.zshenv`, every zsh) or `rc.d/` (end of
+  `zshrc`); aliases in `aliases/<name>.aliases.sh`. 10 OS, 20 dev,
+  30 desktop, 40 window manager, 50 host.
+- pi's config is `dev/.config/pi/agent` (stowed to `~/.config/pi/agent`).
   `.gitignore` ignores everything else there; keep it deny-by-default.

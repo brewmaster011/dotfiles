@@ -19,13 +19,23 @@ make install
 
 ## install.sh
 
-Interactive bootstrap script that:
+Bootstrap script that:
 
 1. Detects OS (Linux or macOS)
-2. Installs system packages via package manager
-3. Initializes git submodules
-4. Prompts for stow packages to install
+2. Prompts for stow packages to install (skipped when `PACKAGES` is set)
+3. Installs the system packages listed for them (`packages/<package>.txt`)
+4. Initializes git submodules
 5. Symlinks configs to home directory via stow
+
+Non-interactive, e.g. for provisioning a server:
+
+```bash
+PACKAGES='common' ./scripts/install.sh
+```
+
+On Debian/Ubuntu `fd` is installed as `fd-find`, and packages the release
+doesn't have (zellij, kanata and neofetch on Debian 13) are skipped with a
+note.
 
 ### Supported Package Managers
 
@@ -38,8 +48,8 @@ Interactive bootstrap script that:
 ## migrate-pi.sh
 
 One-off, per machine: moves pi's agent dir from `~/.pi/agent` to
-`~/.config/pi/agent` (where `PI_CODING_AGENT_DIR` from `common/.zshenv` points), removes a leftover `~/.pi/agent` link,
-re-points `~/.local/bin/pi`, and links the pi config tracked in `common`. Run it with every pi session closed. See
+`~/.config/pi/agent` (where `PI_CODING_AGENT_DIR` from dev's `env.d` points), removes a leftover `~/.pi/agent` link,
+re-points `~/.local/bin/pi`, and links the pi config tracked in `dev`. Run it with every pi session closed. See
 "pi coding agent" in the top-level README.
 
 ## Makefile
@@ -57,24 +67,30 @@ re-points `~/.local/bin/pi`, and links the pi config tracked in `common`. Run it
 
 ```bash
 # Framework laptop with Hyprland
-make stow PACKAGES='common linux hyprland framework'
+make stow PACKAGES='common dev desktop hyprland framework'
 
 # Desktop with dwm
-make stow PACKAGES='common linux dwm'
+make stow PACKAGES='common dev desktop dwm'
 
 # macOS
-make stow PACKAGES='common macos'
+make stow PACKAGES='common dev macos'
+
+# Server
+make stow PACKAGES='common'
 ```
 
 ## Package Lists
 
 Located in `scripts/packages/`:
 
-| File        | Purpose                              |
-|-------------|--------------------------------------|
-| `base.txt`  | Cross-platform (git, neovim, zsh...) |
-| `linux.txt` | Linux-only (dunst, kanata, ranger)   |
-| `macos.txt` | macOS-only (Homebrew packages)       |
+| File          | Purpose                                    |
+|---------------|--------------------------------------------|
+| `common.txt`  | Every machine (git, stow, zsh, neovim, fzf) |
+| `dev.txt`     | dev (ripgrep, fd, eza, zellij, ranger...)  |
+| `desktop.txt` | Linux desktop (dunst, kanata)              |
+| `macos.txt`   | macOS-only (Homebrew packages)             |
+
+install.sh installs the lists of the stow packages you pick.
 
 Edit these files to customize which packages get installed.
 
@@ -85,8 +101,9 @@ scripts/
   install.sh      # Main bootstrap script
   migrate-pi.sh   # One-off move of pi's agent dir to ~/.config/pi/agent
   packages/
-    base.txt      # Cross-platform packages
-    linux.txt     # Linux packages
-    macos.txt     # macOS packages
+    common.txt    # every machine
+    dev.txt       # dev
+    desktop.txt   # Linux desktop
+    macos.txt     # macOS
   post-install/   # (Reserved for post-install hooks)
 ```

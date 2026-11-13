@@ -1,11 +1,7 @@
-# ABOUTME: Linux-specific packages
-# ABOUTME: Installed only on Linux systems
+# ABOUTME: Packages for desktop (Linux GUI, shared by hyprland and dwm)
 
-# Desktop environment tools
 dunst
 kanata
-ranger
-neofetch
 
 # For Hyprland
 # hyprland

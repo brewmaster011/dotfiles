@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # ABOUTME: Bootstrap script for dotfiles installation
-# ABOUTME: Handles package installation and stow package selection across Linux and macOS
+# ABOUTME: Picks the stow packages, installs their system packages, then stows them
+#
+# Interactive by default. Set PACKAGES to skip the prompt (provisioning):
+#   PACKAGES='common' ./scripts/install.sh
 
 set -euo pipefail
 
@@ -17,71 +20,86 @@ echo "Detected OS: $OS_TYPE"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
 
-# Install packages
-if [[ "$OS_TYPE" == "macos" ]]; then
+# Pick the stow packages
+if [[ -z "${PACKAGES:-}" ]]; then
+    echo ""
+    echo "Available stow packages:"
+    echo "  common     - Every machine, servers too (zsh, nvim without plugins, server aliases)"
+    echo "  dev        - Machines you work on (nvim plugins + LSP, zellij, pi, yazi, ranger, btop)"
+    echo "  desktop    - Linux desktop (alacritty, dunst, kanata, pipewire, runit ssh-agent, scripts)"
+    echo "  macos      - macOS (aerospace, alacritty, kanata, kubectl, shell profile)"
+    echo "  hyprland   - Hyprland/Wayland (hypr, waybar, wofi, feh)"
+    echo "  dwm        - X11/dwm (picom, xmodmap, .xinitrc, startx on TTY1)"
+    echo "  framework  - Framework laptop host (hypr host.lua, waybar, wluma, color-calibration, easyeffects)"
+    echo "  cosmo      - Desktop host (hypr host.lua, waybar, NVIDIA env)"
+    echo ""
+    if [[ "$OS_TYPE" == "macos" ]]; then
+        PACKAGES="common dev macos"
+        echo "Default for macOS: $PACKAGES"
+        read -p "Use these packages? [Y/n] " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Nn]$ ]]; then
+            read -p "Enter packages to install (space-separated): " PACKAGES
+        fi
+    else
+        echo "Examples:"
+        echo "  Server: common"
+        echo "  Framework laptop with Hyprland: common dev desktop hyprland framework"
+        echo "  cosmo desktop with Hyprland: common dev desktop hyprland cosmo"
+        echo ""
+        read -p "Enter packages to install (space-separated): " PACKAGES
+    fi
+fi
+
+# System packages: scripts/packages/<package>.txt for each chosen package that
+# has a list, without comments
+lists=()
+for pkg in $PACKAGES; do
+    [[ -f "$SCRIPT_DIR/packages/$pkg.txt" ]] && lists+=("$SCRIPT_DIR/packages/$pkg.txt")
+done
+wanted=()
+if (( ${#lists[@]} )); then
+    while read -r name; do wanted+=("$name"); done \
+        < <(sed 's/#.*//' "${lists[@]}" | tr -s ' \t' '\n' | grep -v '^$')
+fi
+
+if (( ${#wanted[@]} == 0 )); then
+    echo "No system packages listed for: $PACKAGES"
+elif [[ "$OS_TYPE" == "macos" ]]; then
     # Install Homebrew if missing
     if ! command -v brew &>/dev/null; then
         echo "Installing Homebrew..."
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
-    
-    if [[ -f "$SCRIPT_DIR/packages/macos.txt" ]]; then
-        echo "Installing macOS packages..."
-        xargs brew install < "$SCRIPT_DIR/packages/macos.txt"
-    fi
-    if [[ -f "$SCRIPT_DIR/packages/base.txt" ]]; then
-        echo "Installing base packages..."
-        xargs brew install < "$SCRIPT_DIR/packages/base.txt"
+    echo "Installing: ${wanted[*]}"
+    brew install "${wanted[@]}"
+elif command -v pacman &>/dev/null; then
+    echo "Detected Arch Linux (pacman)"
+    sudo pacman -S --needed "${wanted[@]}"
+elif command -v apt-get &>/dev/null; then
+    echo "Detected Debian/Ubuntu (apt)"
+    # Debian names (fd is fd-find); skip what the release doesn't package
+    # (zellij, kanata and neofetch aren't in Debian 13)
+    apt_pkgs=()
+    for name in "${wanted[@]}"; do
+        case $name in fd) name=fd-find ;; esac
+        if [[ -n "$(apt-cache policy "$name" 2>/dev/null | awk '/Candidate:/ && $2 != "(none)" {print $2}')" ]]; then
+            apt_pkgs+=("$name")
+        else
+            echo "Not packaged for this release, skipped: $name"
+        fi
+    done
+    if (( ${#apt_pkgs[@]} )); then
+        sudo apt-get install -y "${apt_pkgs[@]}"
     fi
 else
-    # Detect Linux distro
-    if command -v pacman &>/dev/null; then
-        echo "Detected Arch Linux (pacman)"
-        if [[ -f "$SCRIPT_DIR/packages/linux.txt" ]] && [[ -f "$SCRIPT_DIR/packages/base.txt" ]]; then
-            sudo pacman -S --needed $(cat "$SCRIPT_DIR/packages/linux.txt" "$SCRIPT_DIR/packages/base.txt")
-        fi
-    elif command -v apt &>/dev/null; then
-        echo "Detected Debian/Ubuntu (apt)"
-        if [[ -f "$SCRIPT_DIR/packages/linux.txt" ]] && [[ -f "$SCRIPT_DIR/packages/base.txt" ]]; then
-            sudo apt install -y $(cat "$SCRIPT_DIR/packages/linux.txt" "$SCRIPT_DIR/packages/base.txt")
-        fi
-    else
-        echo "Warning: Unknown package manager. Skipping package installation."
-    fi
+    echo "Warning: Unknown package manager. Skipping package installation."
 fi
 
 # Initialize git submodules
 echo "Initializing git submodules..."
 cd "$DOTFILES_DIR"
 git submodule update --init --recursive
-
-# Prompt for packages to stow
-echo ""
-echo "Available stow packages:"
-echo "  common     - Cross-platform (nvim, zsh, alacritty, zellij, pi)"
-echo "  linux      - Linux-only (dunst, kanata, ranger, neofetch, runit, scripts)"
-echo "  macos      - macOS-specific (aerospace)"
-echo "  hyprland   - Hyprland/Wayland (hypr, waybar, wofi, feh)"
-echo "  dwm        - X11/dwm (picom, xmodmap, .xinitrc)"
-echo "  framework  - Framework laptop host (hypr host.lua, waybar, wluma, color-calibration, easyeffects)"
-echo "  cosmo      - Desktop host (hypr host.lua, waybar, NVIDIA env)"
-echo ""
-
-if [[ "$OS_TYPE" == "macos" ]]; then
-    PACKAGES="common macos"
-    echo "Default for macOS: $PACKAGES"
-    read -p "Use these packages? [Y/n] " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Nn]$ ]]; then
-        read -p "Enter packages to install (space-separated): " PACKAGES
-    fi
-else
-    echo "Examples:"
-    echo "  Framework laptop with Hyprland: common linux hyprland framework"
-    echo "  cosmo desktop with Hyprland: common linux hyprland cosmo"
-    echo ""
-    read -p "Enter packages to install (space-separated): " PACKAGES
-fi
 
 # Run stow
 if [[ -n "$PACKAGES" ]]; then
@@ -93,7 +111,11 @@ if [[ -n "$PACKAGES" ]]; then
     fi
     stow $PACKAGES -t ~
     echo ""
-    echo "Done! Run 'nvim' to trigger lazy.nvim plugin installation."
+    if [[ " $PACKAGES " == *" dev "* ]]; then
+        echo "Done! Run 'nvim' to trigger lazy.nvim plugin installation."
+    else
+        echo "Done!"
+    fi
 else
     echo "No packages selected. You can run stow manually later:"
     echo "  cd $DOTFILES_DIR && stow <packages> -t ~"
